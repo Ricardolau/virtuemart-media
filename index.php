@@ -22,7 +22,7 @@
 				<p>Lo ideal sería que fuera un componente a parte, para poder realizarlo directamente en la web, sin tener que tener un servidor local y realizar instalaciones locales de nuestra web.</p>
 				<div class="alert alert-info">
 				<strong>IDEAS:</strong>
-				<p>Crear un extension de virtuemart que realice este proceso.</p>
+				<p>Crear un extension de virtuemart que realice este proceso.<strong>Dejaría ser independiente a virtuemart.</strong></p>
 				</div>
 				<h3>Controlar las imagenes que tenemos en virtuemart en productos</h3>
 				<p> Para poder controlar la imagenes de virtuemart tenemos crear una <strong>conexion a la base datos</strong>, ya que sino no podemos saber que imagenes están añadidas a los productos.</p>
