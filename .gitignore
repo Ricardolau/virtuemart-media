@@ -1,0 +1,5 @@
+# Ignorar el contenido de las carpetas log y cache
+configuracion.php
+BancoFotos/
+# Para aquellos que utilizan IDE NetBeans
+/nbproject/ 
