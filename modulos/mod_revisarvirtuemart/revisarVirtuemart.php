@@ -66,22 +66,16 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 	<div class="container">
 		<div class="col-md-8">
 			<h1>Vamos recortar y redimensionar imagenes </h1>
-			<p>La imagenes vamos a tratar son las imagenes que tenemos en el directorio <strong><?php echo $DirImagOriginales;?></strong>.NO tratamos directamente las imagenes virtuemart.</p>
-			<p> Recortamos las imagenes tanto si son "Panoramicas o Verticales" en cuadradas.</p>
-			<div class="alert alert-info">
-				<strong>RECUERDA:</strong>
-				<p>No se trata las imagenes que ya exista imagen redimensionada en la ruta destino:<strong><?php echo $DirImagRecortadas;?></strong>.</p>
-				</div>
+			<p>La imagenes las recorta, convirtiendo en cuadradas, tanto si son "Panoramicas o Verticales".</p>
+			<p> A continuacion las redimensiona a los parametros que le indicamos.</p>
 			<h3>Parametros que tiene por defecto</h3>
 			<p><strong>Nombre de servidor:</strong> <?php echo $NombreServidor;?></p>
 			<p><strong>Ruta de servidor:</strong> <?php echo $RutaServidor;?></p>
+			<p><strong>Directorio de Origen:</strong> <?php echo $DirImagOriginales;?><p>
+			<p><strong>Directorio de destino:</strong> <?php echo $DirImagRecortadas;?><p>
 			<p><strong>La medida final de la imagen:</strong> <?php echo $sufijo;?></p>
-			<p><strong>Ficheros encontrado en destino:</strong> <?php echo count($files);?></p>
-			<p><strong>Imagenes a tratar:</strong> <?php echo count($Imagenes);?><br/>
-			Aquellas ficheros que son imagenes , que no son cuadradas ya.
 			</p>
-			<p><input type="submit" value="Actualiza y limpiar Directorios destino y origen" onclick="metodoClick('VerRecambio');"> 
-			<br/>Eliminar las imagenes que hay en directorios trabajo ( destino y origen) y copias las imagenes que tenemos en la instalación virtuemart local.</p>
+			<p>Recuerda que el script revisa si existe la imagen redimensionada en el directorio destino, por lo que si quiere redimensionar todas las imagenes solo tienes que eliminar las imagenes del destino.</p>
 			<h2>Listado de ficheros erroneos</h2>
 			<p> Revisamos si el fichero es una imagen y si es gif, jpg o png, si no es entonces lo registramos como un fichero erroneo.</p>
 			<p>Hemos encontrado <?php echo count($FilesErroneos);?> que listamos a continuación:</p>

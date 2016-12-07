@@ -16,8 +16,8 @@
 				<h2>El objetivo de está aplicacion local </h2>
 				<p>Conseguir una aplicación totalmente independiente de virtuemar que :</p>
 				<ul>
-					<li>- Controle las imagenes que tienes virtuemart en productos y si realmente está asociadas a productos.</li>
-					<li>- Redimensiones las pagina a las medidas que le indiquemos.</li>
+					<li>- Saber si las imagenes directorio product de virtuemart son utilizados por los productos que tenemos Base Datos.</li>
+					<li>- Creando la imagenes miniatura de la imagenes de productos a la medida que le indiquemos, recortando la imagen y redimensionado.</li>
 				</ul>
 				<p>Lo ideal sería que fuera un componente a parte, para poder realizarlo directamente en la web, sin tener que tener un servidor local y realizar instalaciones locales de nuestra web.</p>
 				<div class="alert alert-info">

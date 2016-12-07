@@ -8,7 +8,7 @@
       <ul class="nav navbar-nav">
 	<li class="active"><a href="<?php echo $HostNombre.'/index.php'?>">Home</a></li>
 	<li><a href="<?php echo $HostNombre.'/modulos/mod_recortarImagenes/recortar.php';?>">Recortar Imagenes</a></li>
-	<li><a href="">Revisar Imagenes Virtuemart</a></li>
+	<li><a href="<?php echo $HostNombre.'/modulos/mod_revisarvirtuemart/revisarVirtuemart.php';?>">Revisar Imagenes Virtuemart</a></li>
       </ul>
     </div>	
   </nav>
