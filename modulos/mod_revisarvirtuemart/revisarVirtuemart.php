@@ -17,7 +17,11 @@
 <head>
 <?php
 	include './../../head.php';
+	include './../../modulos/mod_conexion/conexionBaseDatos.php';
 ?>
+
+
+
 </head>
 <body>
 <?php 
@@ -33,117 +37,98 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 // Incluimos fichero funciones
  include 'funciones.php';
  
- // Creamos array de imagenes, con las siguiente extructura:
- //  [NumeroImagen] Array
- //           [nombre] => nombre.extension
- //           [ancho] => 500
- //           [alto] => 375
- //           [tipoimagen] => 'C' cuadrada, 'P' panoramica, 'V' verticalimage/jpeg
- //           [tipofichero] => 1,2,3,4,5,6 ( gif,jpg,png y más extensiones pero no la utilizo) ver funcion exif_imagetype()
- //
- 
- $files = array_filter(glob($RutaServidor.$DirImagOriginales."*"), 'is_file');
+ // Creamos array de ficheros que existene en el directorio
+ $files = array_filter(glob($RutaServidor.$DirInstVirtuemart."*"), 'is_file');
  //  Files es un array con solo ficheros del directorio que indicamos.
- $x=0;// Contador para imagenes correctas.
- $y=0;// Contador para ficheros o imagenes erroneas.
- foreach ($files as $file){
-	 // Llamamos a funcion con ruta fichero ...
-	 $DatosImagen = DatosImagen($file);
-	 // Si la imagen es cuadrada o el fichero no es una imagen no la añadimos
-	switch (true){
-		case (!empty($DatosImagen['error'])):
-			// Hay el parametro error entonces continuamos con foreach.
-			$y= $y+1;
-			$FilesErroneos [$y] = $DatosImagen;
-			continue;
-		default:
-			$x= $x+1;
-			$Imagenes [$x] = $DatosImagen;
+ 
+ // Ahora buscamos en basedatos la imagen.
+ 
+ //~ echo '<pre>';
+ 
+ //~ $consultaImgMedia = mysqli_query($BDVirtuemart, "SELECT `virtuemart_media_id`,`file_url` FROM `mw3xj_virtuemart_medias` where `file_url`= '".$fichero."'");
+ 
+ //~ echo 'FICHERO NO ENCONTRADOS MEDIA';
+ $x = 0;
+ $ficheros = array();
+ foreach ( $files as $file ){
+		
+		$fichero=basename($file); // Nombre de fichero con extension ..
+		// Ahora tenemos que añadirle directorio de sistema
+		$fichero = 'images/stories/virtuemart/product/'.$fichero;
+		//~ echo $fichero.'<br/>';
+		$consultaImgMedia = $BDVirtuemart->query( "SELECT `virtuemart_media_id`,`file_url` FROM `mw3xj_virtuemart_medias` where `file_url`= '".$fichero."'");
+		if ($consultaImgMedia->num_rows == 0){
+		$x= $x +1;
+			// Lo anotamos como error , ya que puede que exista, pero el nombre tenga caracteres extraños y no lo encuentre por eso. 
+			$ficheros[$x]['error'] = 'No existe en media';
+			$ficheros[$x]['Ruta'] = $file;
+		} else {
+			// Quiere decir que existe en media ..
+			$id_media = $consultaImgMedia->fetch_assoc();
+			$id_media = $id_media['virtuemart_media_id']; //obtenemos id que vamos buscar en product_media
+			// Ahora buscamos en product_media a ver si existe...
+			$consultaImgProd = $BDVirtuemart->query( "SELECT * FROM `mw3xj_virtuemart_product_medias` WHERE `virtuemart_media_id` =".$id_media);
+			if ($consultaImgProd->num_rows == 0){
+				// Quiere decir que no existe en producto.
+				$x= $x +1;
+				$ficheros[$x]['aviso'] = 'No encuenta ID_media:'.$id_media.' en product_media';
+				$ficheros[$x]['Ruta'] = $file; 
+				//~ echo $fichero. 'ID de media'.$id_media['virtuemart_media_id'].'<br/>';
+			}
+		
+	
+			
+		}
+		
 	}
- }
+ 
+ //~ print_r($ficheros);
+ 
+ //~ echo '</pre>';
+ 
 ?>
 
 	<div class="container">
 		<div class="col-md-8">
-			<h1>Vamos recortar y redimensionar imagenes </h1>
-			<p>La imagenes las recorta, convirtiendo en cuadradas, tanto si son "Panoramicas o Verticales".</p>
-			<p> A continuacion las redimensiona a los parametros que le indicamos.</p>
-			<h3>Parametros que tiene por defecto</h3>
-			<p><strong>Nombre de servidor:</strong> <?php echo $NombreServidor;?></p>
-			<p><strong>Ruta de servidor:</strong> <?php echo $RutaServidor;?></p>
-			<p><strong>Directorio de Origen:</strong> <?php echo $DirImagOriginales;?><p>
-			<p><strong>Directorio de destino:</strong> <?php echo $DirImagRecortadas;?><p>
-			<p><strong>La medida final de la imagen:</strong> <?php echo $sufijo;?></p>
-			</p>
-			<p>Recuerda que el script revisa si existe la imagen redimensionada en el directorio destino, por lo que si quiere redimensionar todas las imagenes solo tienes que eliminar las imagenes del destino.</p>
+			<h1>Imagenes utilizadas en virtuemart ( product) </h1>
+			<p>El objetivo es saber que imagenes hay en el directorio de virtuemart/product que no se utilizan en los productos.</p>
+			<h3>Pasos que realizamos</h3>
+			<ul>
+			<li>Creamos array de ficheros que hay en directorio virtuemart/product</li>
+			<li>Buscamos el campo `virtuemart_media_id` en la tabla `mw3xj_virtuemart_medias` que contenga direccion del fichero en el campo 'file_url'.</li>
+			<li>Buscamos el id 'vituemart_media_id' en la tabla `mw3xj_virtuemart_product_medias`  para saber si se usa en algún producto, si no se usa entonces </li>
+			<ul>
+			<li> Comprobamos si existe miniatura.</li>
+			<li> ELiminamos imagen y miniatura si existe ( de momento solo mostramos en pantalla)</li>
+			</ul>
+			<li></li>
+			</ul>
 			<h2>Listado de ficheros erroneos</h2>
-			<p> Revisamos si el fichero es una imagen y si es gif, jpg o png, si no es entonces lo registramos como un fichero erroneo.</p>
-			<p>Hemos encontrado <?php echo count($FilesErroneos);?> que listamos a continuación:</p>
+			<p> Estos ficheros no se pueden eliminar directamente.</p>
+			<p> Es mejor buscar mano estos ficheros y comprobar si realmente no existem en la tabla media, antes de borrarlos</p>
 			<?php
-			foreach ($FilesErroneos as $ficheroError)
+			$x= 0;
+			foreach ($ficheros as $fichero)
 			{
-			echo '<p><strong>'.$ficheroError['nombre'].$ficheroError['extension'].'</strong>';
-			echo $ficheroError['error'].'</p>';
+				if (isset($fichero['error'])){
+					$x= $x+1;
+					echo $x.'- '.$fichero['Ruta'].'<br/>';
+				}
 			}
 			?>
 		</div>
 		<div class="col-md-4">
-						<h2>Listado de imagenes a tratar</h2>
-			<p> Un total imagenes a tratar de <?php echo count($Imagenes);?></p>
+						<h2>Imagenes que no se utiliza</h2>
+			<p> Listado de imagenes que no se encuentrar en tabla product_media.</p>
 			<?php
-			$c=0;
-			$p=0;
-			$v=0;
-			foreach ($Imagenes as $imagen)
+			$x=0;
+			foreach ($ficheros as $fichero)
 			{
-			?>	
-	<!--
-				<p><strong><?php echo $imagen['nombre'].$imagen['extension'];?></strong>
-	-->
-				<?php 
-					 if  (empty($imagen['error'])) 
-					{?>
-						<?php // Ahora vamos a recortar solo aquellas imagenes que no existan ya en directorio de minuaturas ( recortadas)
-							if (!file_exists($RutaServidor.$DirImagRecortadas.$imagen['nombre'].$sufijo.$imagen['extension'])) {
-								 // No existe la imagen recortada, ejecutamos funcion de recortar.
-								 // La funcion recortar se llama RecortarImagenC
-								 // enviando array de imagen, el nuevo destino.
-								 $DestinoRe =	$RutaServidor.$DirImagRecortadas;
-								 // y el sufijo , que pusimos en datos inciales.
-								 if ($imagen['tipoimagen'] == 'C'){
-											$c=$c+1;
-								}
-								 if ($imagen['tipoimagen'] == 'V'){
-											$v=$v+1;
-								}
-								 if ($imagen['tipoimagen'] == 'P'){
-											$p=$p+1;
-								}
-
-								 RecortarImagenC ($imagen,$DestinoRe,$sufijo);?>
-	<!--
-								<span> Recorte y redimensionada </span>
-	-->
-							<?php
-							} else {?>
-							<p><strong><?php echo $imagen['nombre'].$imagen['extension'];?></strong>
-							<?php
-							echo '<span>NO RECORTA , POR EXISTE MINIATURA </span>';
-
-							}
-							?>
-						<?php
-					} else {
-					echo '<span>NO es correcta la imagen, formato incorrecto. </span>';
-					}?>
-				</p>
-			<?php
-			}?>
-			<?php 
-			echo ' IMAGENES RECORTADAS ';
-			echo 'Imagenes cuadradas:'.$c.'<br>';
-			echo 'Imagenes vertical:'.$v.'<br>';
-			echo 'Imagenes panoramicas:'.$p.'<br>';
+				if (isset($fichero['aviso'])){
+					$x= $x+1;
+					echo $x.'- '.basename($fichero['Ruta']).'<br/>';
+				}
+			}
 			?>
 		</div>
 	

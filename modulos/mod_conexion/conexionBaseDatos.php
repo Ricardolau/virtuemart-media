@@ -16,18 +16,18 @@ $Conexiones = array();
 /*************   Realizamos conexion de base de datos de ImportarRecambios.          ************/
 /************************************************************************************************/
 $Conexiones [1]['NombreBD'] = $BaseDatos;
-$BDImportRecambios = new mysqli("localhost", $usuario, $passport , $BaseDatos);
+$BDVirtuemart = new mysqli("localhost", $usuario, $passport , $BaseDatos);
 // Como connect_errno , solo muestra el error de la ultima instrucción mysqli, tenemos que crear una propiedad, en la que 
 // está vacía, si no se produce error.
-if ($BDImportRecambios->connect_errno) {
+if ($BDVirtuemart->connect_errno) {
 		$Conexiones [1]['conexion'] = 'Error';
-		$Conexiones [1]['respuesta']=$BDImportRecambios->connect_errno.' '.$BDImportRecambios->connect_error;
-		$BDImportRecambios->controlError = $BDImportRecambios->connect_errno.':'.$BDImportRecambios->connect_error;
+		$Conexiones [1]['respuesta']=$BDVirtuemart->connect_errno.' '.$BDVirtuemart->connect_error;
+		$BDVirtuemart->controlError = $BDVirtuemart->connect_errno.':'.$BDVirtuemart->connect_error;
 } else {
 	$Conexiones [1]['conexion'] ='Correcto';
-	$Conexiones [1]['respuesta']= $BDImportRecambios->host_info;
+	$Conexiones [1]['respuesta']= $BDVirtuemart->host_info;
 /** cambio del juego de caracteres a utf8 */
- mysqli_query ($BDImportRecambios,"SET NAMES 'utf8'");
+ mysqli_query ($BDVirtuemart,"SET NAMES 'utf8'");
 }
 
 

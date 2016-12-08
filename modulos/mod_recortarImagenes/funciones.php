@@ -168,6 +168,7 @@ function RecortarImagenC ($imagen,$destino,$sufijo)
 			}
 	}
 
+
 	
 ?>
 

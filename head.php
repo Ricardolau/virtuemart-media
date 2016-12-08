@@ -1,7 +1,7 @@
 <?php
 	// Añadimos configuracion
 	include 'configuracion.php';
-	include './modulos/mod_conexion/conexionBaseDatos.php';
+	
 ?>
 
 

@@ -18,6 +18,31 @@
 <?php
 	include './../../head.php';
 ?>
+<!-- Script acciones de usuario -->
+<script>
+function metodoClick(pulsado){
+	    console.log("Inicimos switch de control pulsar");
+	    switch(pulsado) {
+			case 'LimpiarCopiar':
+				console.log('Entro en LimpiarCopiar');
+				// Cargamos variable global ar checkID = [];
+				LimpiarCopiar ();
+				break;
+			case 'OtraAccion':
+				// Obtenemos puesto en input de Buscar
+				console.log('OtraAccion');
+				break;
+			default:
+				alert('Error pulsado incorrecto');
+			}
+}
+function LimpiarCopiar(){
+	var respuestaConf = confirm('Copiar y Limpiar directorios trabajo');
+	if (respuestaConf == true) {;
+		alert('Si');
+	}
+}
+</script>
 </head>
 <body>
 <?php 
@@ -80,7 +105,7 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 			<p><strong>Imagenes a tratar:</strong> <?php echo count($Imagenes);?><br/>
 			Aquellas ficheros que son imagenes , que no son cuadradas ya.
 			</p>
-			<p><input type="submit" value="Actualiza y limpiar Directorios destino y origen" onclick="metodoClick('VerRecambio');"> 
+			<p><input type="submit" value="Actualiza y limpiar Directorios destino y origen" onclick="metodoClick('LimpiarCopiar');"> 
 			<br/>Eliminar las imagenes que hay en directorios trabajo ( destino y origen) y copias las imagenes que tenemos en la instalación virtuemart local.</p>
 			<h2>Listado de ficheros erroneos</h2>
 			<p> Revisamos si el fichero es una imagen y si es gif, jpg o png, si no es entonces lo registramos como un fichero erroneo.</p>
