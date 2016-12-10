@@ -24,23 +24,60 @@
 				<strong>IDEAS:</strong>
 				<p>Crear un extension de virtuemart que realice este proceso.<strong>Dejaría ser independiente a virtuemart.</strong></p>
 				</div>
-				<div class="panel-group" id="accordion">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-						<h3 class="panel-title">
-							<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">¿Saber que imagenes realmente utilizamos en los productos?</a>
-						</h3>
+				<div>
+						<h4>
+							<?php 
+							/* Para que este expandido, lo hace con date aria-expanded ="false" o "true"
+							 * */
+							?>
+							<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">¿Saber que imagenes realmente utilizamos en los productos?
+							<span style="float:right;" class="icono-collapse">+</span>
+							</a>
+							
+						</h4>
+						<div id="collapseOne" class="collapse pepe">
+							<p>El gestor multimedia de virtuemart (Archivos de medios) <strong>NO</strong> nos facilita que ficheros multimedia estan utilizados por que productos.</p>
+							<p> Por esté motivo, el apartado de "Revisar Imagenes Virtuemart" donde necesitamos una <strong>conexion a la base datos local</strong> de nuestra web, para poder indicar que ficheros son utilizados y por cuales.</p>
+							<p> De momento no controlamos si realmente hay conexion, por lo que te recomiendo que revises log errores de servidor si ves que no funciona correctamente.</p>
+							<p> Y revisa el fichero configuracion donde indicamos servidor, base de datos y usuario.</p>
+							
 						</div>
-						<div id="collapseOne" class="panel-collapse collapse in">
-							<div class="panel-body">
-								<p> Para saber que imagenes utilizamos en los productos creamos una <strong>conexion a la base datos local</strong>.</p>
-								<p> Ver el fichero configuracion donde indicamos servidor, base de datos y usuario.</p>
-								<p> De momento no controlamos si realmente hay conexion, por lo que te recomiendo que revises log errores de servidor si ves que no funciona correctamente.</p>
-								
-							</div>
-						</div>
-					</div>
 				</div>
+				<div>
+						<h4>
+							<?php 
+							/* Para que este expandido, lo hace con date aria-expanded ="false" o "true"
+							 * */
+							?>
+							<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false">¿Que hace realmente el gestor multimedia de virtuemart?
+							<span style="float:right;" class="icono-collapse">+</span>
+							</a>
+							
+						</h4>
+						<div id="collapseTwo" class="collapse pepe">
+							<p> Archivos de medios es el gestor multimedia de virtuemart, que nos permite:</p>
+							<ul>
+							<li><strong>Editar:</strong> Modificar el "Título archivo único", poner los subtitulos, Clase css,texto alternativo en caso de no carga y incluso seleccionar otra url para esa imagen.</li>
+							<li><strong>Eliminar:</strong> La elimina de la tabla de virtuemart_media y elimina la imagen miniatura. <strong>OJO!! No elimina la imagen del directorio original</strong>. ( categoria,product,fabricante,vendedor....)</li>
+							<li><strong>Nuevo:</strong> Nos deja añadir una imagen nueva, donde le indicamos ubicacion-tipo, si es product, categoria, fabricante...Normalmente no lo utilizo. </li>
+							<li><strong>Sincronizar Medios con virtuemart:</strong> Pienso que lo hace, es ver la imagenes que hay dentro del directorio stories/viertuemart ( por defecto) y crea miniaturas, añadiendolo a la tabla de virtuemart_medios. </li>
+							</ul>
+							<p> Por lo que observo en las opciones que tiene al añadir un fichero, el apartado virtuemart "Arichovs de medios" de virtuemart, permite tener ficheros para luego descargar y poder venderlos. No lo utilizo , asi que no se como va.</p>
+								
+						</div>
+				</div>
+				<script>
+				// Cambien id por clase, pero no funciona correctamente
+				// ya que pone - a todos cuando uno esta desplegado.
+				$(document).ready(function(){
+				  $(".collapse.pepe").on("hide.bs.collapse", function(){
+					$(".icono-collapse").html('+');
+				  });
+				  $(".collapse.pepe").on("show.bs.collapse", function(){
+					$(".icono-collapse").html('-');
+				  });
+				});
+				</script>
 				<div class="alert alert-info">
 				Al crear la miniaturas lo hace en directorio dentro <?php echo $DirImagRecortadas;?> , para evitar romper la web, por lo que se recomienda hacer una copia de seguridad antes pegar las imagenes en la web.
 				</div>
