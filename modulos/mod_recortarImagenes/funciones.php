@@ -175,6 +175,9 @@ function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 			imagedestroy($thumbail);
 	}
 
+/*  =========================================================================================== */
+/*  ================== CONDICIONAL PARA EJECUTAR FUNCIONES CON  AJAX     ====================== */
+/*  =========================================================================================== */
 
 	
 ?>
