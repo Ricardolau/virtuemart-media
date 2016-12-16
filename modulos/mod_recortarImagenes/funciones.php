@@ -52,7 +52,7 @@ function DatosImagen ($imagen)
 						'alto' 			=> $dim[1],    
 						'tipofichero' 	=> $type,
 						'tipoimagen' 	=> $Tipoimagen
-
+						
 					);
 					 
 					
@@ -75,7 +75,7 @@ function DatosImagen ($imagen)
 		return $respuesta;
 	}	
 
-function RecortarImagenC ($imagen,$destino,$sufijo)
+function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 	{
 			/* Recuerda que esta funcion recorta una imagen tanto sea vertical como panoramica y la 
 			 * convierte en cuadrado.
@@ -95,10 +95,8 @@ function RecortarImagenC ($imagen,$destino,$sufijo)
 			 **/
 			// Ahora calculamos cual es el cuadrado más grande posible.
 			// que no los indica el lado más corto.
-			if ($imagen['tipoimagen'] == 'V'){
-				// Lado más corto es el ancho
-				$NuevaMedida = $imagen['ancho'];
-			}
+			$NuevaMedida = $imagen['ancho'];;
+			
 			if ($imagen['tipoimagen'] == 'P'){
 				// Lado más corto es el alto
 				$NuevaMedida = $imagen['alto'];
@@ -115,7 +113,7 @@ function RecortarImagenC ($imagen,$destino,$sufijo)
 				$CorteY = $yAlto - ($NuevaMedida/2);
 				
 			// Ahora creamos la imagen con la nueva medida. ( en memoria solo)
-			$thumbail = imagecreatetruecolor($NuevaMedida, $NuevaMedida);
+			$thumbail = imagecreate($NuevaMedida, $NuevaMedida);
 			// Ahora según el tipo de fichero utilizamos una imagecreatejpeg, imagecreatepng, imagecreategif
 			// Esta instrucción crea una imagen igual a la original.
 			
@@ -141,14 +139,15 @@ function RecortarImagenC ($imagen,$destino,$sufijo)
 			} else {
 				// Si la imagen es cuadrada
 				// Entonces $thumbail es copiaOrigen, ya que no se recorta.
-				
 				$thumbail = $copiaOrigen ;
+				
 			}
-			// Ahora escalamos la imagen a la medida 401x401
-			$thumbail = imagescale($thumbail, $ImgAltoCfg, $ImgAnchoCfg,IMG_BICUBIC_FIXED);
+			// Ahora escalamos la imagen a la medida de configuracion
+			$thumbail = imagescale($thumbail, $ImgAltoCfg, $ImgAnchoCfg,  IMG_BICUBIC);
 			// Ahora creamos la nueva ruta destino
 			$RutaImagenNueva = $destino.$imagen['nombre'].$sufijo.$imagen['extension'];
 			//~ echo 'RutaImagenNueva : '.$RutaImagenNueva.'<br/>';
+			
 			//~ header("Content-type: image/jpeg");
 			//~ echo imagejpeg($thumbail);
 			// Ahora creamos la imagen recortada.
@@ -161,11 +160,19 @@ function RecortarImagenC ($imagen,$destino,$sufijo)
 
 						break;
 					case 3 :
-						imagepng($thumbail, $RutaImagenNueva,7);
+						// Desactivar la mezcla alfa y establecer la bandera alfa
+						
+						imageAlphaBlending($thumbail,true);
+						imageSaveAlpha($thumbail, true);
+									
+						// Guardamos en fichero
+						imagepng($thumbail, $RutaImagenNueva,5);
 						break;
 			
 		
 			}
+			// liberar la imagen de la memoria
+			imagedestroy($thumbail);
 	}
 
 

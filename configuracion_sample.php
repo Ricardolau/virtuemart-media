@@ -8,6 +8,7 @@ $DirImagRecortadas =$HostNombre.'/BancoFotos/ResizeCuadradas/';
 $usuario="usuario";
 $BaseDatos="basedatos";
 $passport ="contraseña3";
+$prefijoTabla ="xxxx"; // Prefijo tabla joomla
 $ImgAltoCfg = 401; // Alto máximo recorte
 $ImgAnchoCfg = 401; // Ancho máximo recorte.
 $DirInstVirtuemart = "/instalacionLocal/images/stories/virtuemart/product/"; //Donde esta instalado virtuemart.

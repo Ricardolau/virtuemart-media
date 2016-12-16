@@ -46,7 +46,7 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
  
  //~ echo '<pre>';
  
- //~ $consultaImgMedia = mysqli_query($BDVirtuemart, "SELECT `virtuemart_media_id`,`file_url` FROM `mw3xj_virtuemart_medias` where `file_url`= '".$fichero."'");
+ 
  
  //~ echo 'FICHERO NO ENCONTRADOS MEDIA';
  $x = 0;
@@ -57,7 +57,7 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 		// Ahora tenemos que añadirle directorio de sistema
 		$fichero = 'images/stories/virtuemart/product/'.$fichero;
 		//~ echo $fichero.'<br/>';
-		$consultaImgMedia = $BDVirtuemart->query( "SELECT `virtuemart_media_id`,`file_url` FROM `mw3xj_virtuemart_medias` where `file_url`= '".$fichero."'");
+		$consultaImgMedia = $BDVirtuemart->query( "SELECT `virtuemart_media_id`,`file_url` FROM `".$prefijoTabla."_virtuemart_medias` where `file_url`= '".$fichero."'");
 		if ($consultaImgMedia->num_rows == 0){
 		$x= $x +1;
 			// Lo anotamos como error , ya que puede que exista, pero el nombre tenga caracteres extraños y no lo encuentre por eso. 
@@ -68,7 +68,7 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 			$id_media = $consultaImgMedia->fetch_assoc();
 			$id_media = $id_media['virtuemart_media_id']; //obtenemos id que vamos buscar en product_media
 			// Ahora buscamos en product_media a ver si existe...
-			$consultaImgProd = $BDVirtuemart->query( "SELECT * FROM `mw3xj_virtuemart_product_medias` WHERE `virtuemart_media_id` =".$id_media);
+			$consultaImgProd = $BDVirtuemart->query( "SELECT * FROM `".$prefijoTabla."_virtuemart_product_medias` WHERE `virtuemart_media_id` =".$id_media);
 			if ($consultaImgProd->num_rows == 0){
 				// Quiere decir que no existe en producto.
 				$x= $x +1;
@@ -124,8 +124,8 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 			<h3>Pasos que realizamos</h3>
 			<ul>
 			<li>Creamos array de ficheros que hay en directorio virtuemart/product</li>
-			<li>Buscamos el campo `virtuemart_media_id` en la tabla `mw3xj_virtuemart_medias` que contenga direccion del fichero en el campo 'file_url'.</li>
-			<li>Buscamos el id 'vituemart_media_id' en la tabla `mw3xj_virtuemart_product_medias`  para saber si se usa en algún producto, si no se usa entonces </li>
+			<li>Buscamos el campo `virtuemart_media_id` en la tabla `$prefijoTabla_virtuemart_medias` que contenga direccion del fichero en el campo 'file_url'.</li>
+			<li>Buscamos el id 'vituemart_media_id' en la tabla `$prefijoTabla_virtuemart_product_medias`  para saber si se usa en algún producto, si no se usa entonces </li>
 				<ul>
 				<li> Comprobamos si existe miniatura.</li>
 				<li> ELiminamos imagen y miniatura si existe ( de momento solo mostramos en pantalla)</li>
