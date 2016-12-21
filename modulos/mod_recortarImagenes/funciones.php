@@ -113,11 +113,12 @@ function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 				$CorteY = $yAlto - ($NuevaMedida/2);
 				
 			// Ahora creamos la imagen con la nueva medida. ( en memoria solo)
-			$thumbail = imagecreate($NuevaMedida, $NuevaMedida);
+			$thumbail = imagecreatetruecolor($NuevaMedida, $NuevaMedida);
 			// Ahora según el tipo de fichero utilizamos una imagecreatejpeg, imagecreatepng, imagecreategif
 			// Esta instrucción crea una imagen igual a la original.
 			
 			$type = $imagen['tipofichero'];
+			
 			switch ($type) {
 					case 1 :
 						$copiaOrigen = imageCreateFromGif($imagen['rutafichero']);
@@ -133,19 +134,20 @@ function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 						break;
 			}
 			
-			// Si la imagen es cuadrada no hace se crea cuadrada.
-			if ($imagen['tipoimagen'] != 'C'){
+				// Ponemos fondo blanco
+				$white = imagecolorallocatealpha($thumbail, 255, 255, 255,127);
+				imagefill($thumbail, 0, 0, $white);
 				imagecopy($thumbail , $copiaOrigen, 0,0,$CorteX,$CorteY,$NuevaMedida,$NuevaMedida);
-			} else {
-				// Si la imagen es cuadrada
-				// Entonces $thumbail es copiaOrigen, ya que no se recorta.
-				$thumbail = $copiaOrigen ;
-				
-			}
+			//~ } else {
+				//~ // Si la imagen es cuadrada
+				//~ // Entonces $thumbail es copiaOrigen, ya que no se recorta.
+				//~ $thumbail = $copiaOrigen ;
+				//~ 
+			//~ }
 			// Ahora escalamos la imagen a la medida de configuracion
 			$thumbail = imagescale($thumbail, $ImgAltoCfg, $ImgAnchoCfg,  IMG_BICUBIC);
 			// Ahora creamos la nueva ruta destino
-			$RutaImagenNueva = $destino.$imagen['nombre'].$sufijo.$imagen['extension'];
+			$RutaImagenNueva = $destino.$imagen['nombre'].$sufijo.'.'.$imagen['extension'];
 			//~ echo 'RutaImagenNueva : '.$RutaImagenNueva.'<br/>';
 			
 			//~ header("Content-type: image/jpeg");
@@ -162,11 +164,11 @@ function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 					case 3 :
 						// Desactivar la mezcla alfa y establecer la bandera alfa
 						
-						imageAlphaBlending($thumbail,true);
-						imageSaveAlpha($thumbail, true);
+						//~ imageAlphaBlending($thumbail,true);
+						//~ imageSaveAlpha($thumbail, true);
 									
 						// Guardamos en fichero
-						imagepng($thumbail, $RutaImagenNueva,5);
+						imagepng($thumbail, $RutaImagenNueva,9);
 						break;
 			
 		
@@ -175,9 +177,6 @@ function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 			imagedestroy($thumbail);
 	}
 
-/*  =========================================================================================== */
-/*  ================== CONDICIONAL PARA EJECUTAR FUNCIONES CON  AJAX     ====================== */
-/*  =========================================================================================== */
 
 	
 ?>

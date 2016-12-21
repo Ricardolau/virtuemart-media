@@ -8,6 +8,12 @@
 <script>
 // Declaramos variables globales javascript
 var checkID = [];
+var nombreFichero = [];
+var extensionFichero = [];
+var tipoFichero=[];
+var anchoFichero = [];
+var altoFichero = [];
+
 // Funcion para controlar lo pulsado (botones y link )
 function metodoClick(pulsado){
 	    console.log("Inicimos switch de control pulsar");
@@ -22,15 +28,24 @@ function metodoClick(pulsado){
 				console.log('Antes redimensionar comprobamos cuantos seleccionado');
 				// Comprobamos seleccion
 				VerFicheroSeleccionado ()
-				console.log('Seleccionado:'+checkID.length);
 				if (checkID.length == 0 ){
 				var respuestaCheck = confirm( 'No hay ninguno seleccionado, \n ¿ Quieres redimensionar todas ?')
-				
+				// Ahora deberiamos crear array de todos los check que aparecen en pantalla.( Tanto como si hay o no paginacion )
+				// Si hay paginación debería poder indicar de alguna forma todos o solo la pagina.
 				}
 				// Funcion para redimensionar
-				Redimensionar();
+				if (checkID.length > 0) {
+					// Antes de enviar a redimensionar, debemos saber si son muchos
+					// ya que si son muchos debemos hacerlo en varios procesos, no en uno..
+					// De momento hacemos uno solo...
+					CuantosFicheros = checkID.length
+					Redimensionar(CuantosFicheros);
+				} else {
+						alert ( ' No hay ninguno selecionado, no continuamos ');
+				} 
 				break;
 			case 'ListaFicherosErroneos':
+				// Llegamos aquí pulsado en link de Ficheros Erroneos (numero) 
 				// Ocultamos listado de ficheros a tratar
 				$('#ListadoFicherosTratar').hide(1000);
 				$('#ListadoFicherosErroneos').show();
@@ -46,31 +61,41 @@ function LimpiarCopiar(){
 	}
 }
 // Funcion para redimensionar imagenes
-function Redimensionar(){
-	// Antes de nada necesito todos los datos ficheros seleccionado para enviar
-		
+function Redimensionar(CuantosFicheros){
+	// CuantosFIcheros lo maximo lo estipulamos con anterioriodad ... ( 50 ficheros por ejemplo)
+	// Si son varios la contestación es para todos.
 	var respuestaRedi = confirm('Si existe la imagen redimensionada la va sustituir por la nueva,\n ¿ Quiere verdad ?');
 	if (respuestaRedi == true)
 	{;
-		
-		// Ahora mandamos tareas realizar.
-		 var parametros = {
-					'pulsado': 'Redimensionar'
-					};
-		$.ajax({
-			data: parametros,
-			url: 'tareas.php',
-			type: 'post',
-			datatype: 'json',
-			beforeSend: function () {
-				$("#procesando").html('Redimensionando imagen');
-			},
-			success: function (response) {
-				respuesta = response[0];
-				$("#procesando").html('RHola');
-				console.log(response[0]);
-			}
-		});
+		for (i = 0; i < checkID.length; i++) {
+			// Ahora mandamos tareas realizar con cada fichero.
+			 var parametros = {
+						'pulsado': 'Redimensionar',
+						'checkID': checkID[i],
+						'nombreFichero': nombreFichero[i],
+						'extensionFichero': extensionFichero[i],
+						'tipoFichero': tipoFichero[i],
+						'altoFichero': altoFichero[i],
+						'anchoFichero': anchoFichero[i]
+						};
+			$.ajax({
+				data: parametros,
+				url: 'tareas.php',
+				type: 'post',
+				datatype: 'json',
+				beforeSend: function () {
+					$("#procesando").html('Redimensionando imagen');
+				},
+				success: function (response) {
+					$("#procesando").html('Procesadas imagenes');
+					// Ahora ponemos estado NUEVA
+					nombreCampo = '#estadoFic'+response['checkID'];
+					$(nombreCampo).html('Nuevo');
+					//~ document.getElementById(nombreCampo).innerHTML='Nuevo';
+					console.log(response['checkID']);
+				}
+			});
+		}
 	}
 }
 // Funcion para leer los check que se seleccionaron
@@ -85,15 +110,58 @@ function VerFicheroSeleccionado (){
 				i++;
 				//todos los que sean de la clase row1
 				if($('input[name=checkFic'+i+']').is(':checked')){
-					// cant cuenta los que está seleccionado.
+					// Solo entramos en los que están seleccionado.
+					// Ahora tengo hacer array :
+					// IDimagenen
+					// 		Nombre
+					// 		Extension
+					// 		Tipo
+					// 		Alto
+					//		Ancho
+					//		Estado
+
 					valor = '0';
 					valor = $('input[name=checkFic'+i+']').val();
 					checkID.push( valor );
-					// Ahora tengo hacer array con id...
+					
+					valor = '0';
+					nombreCampo = 'nombreFic'+i;
+					valor = document.getElementById(nombreCampo).innerHTML;
+					nombreFichero.push( valor );
+					
+					valor = '0';
+					nombreCampo = 'extensionFic'+i;
+					valor = document.getElementById(nombreCampo).innerHTML;
+					extensionFichero.push( valor );
+					
+					valor = '0';
+					nombreCampo = 'tipoFic'+i;
+					valor = document.getElementById(nombreCampo).innerHTML;
+					tipoFichero.push( valor );
+					
+					valor = '0';
+					nombreCampo = 'anchoFic'+i;
+					valor = document.getElementById(nombreCampo).innerHTML;
+					anchoFichero.push( valor );
+					
+					valor = '0';
+					nombreCampo = 'altoFic'+i;
+					valor = document.getElementById(nombreCampo).innerHTML;
+					altoFichero.push( valor );
+					
+					
+					
 				}
 				
 			});
-			console.log('ID de Ficheros seleccionado:'+checkID);
+			console.log('ID de Ficheros seleccionadas:'+checkID);
+			console.log('Nombre de Ficheros seleccionadas:'+nombreFichero);
+			console.log('Extension de Ficheros seleccionadas:'+extensionFichero);
+			console.log('Tipo de Ficheros seleccionadas:'+tipoFichero);
+			console.log('Ancho imagen seleccionadas:'+anchoFichero);
+			console.log('Alto de Ficheros seleccionadas:'+altoFichero);
+
+			
 			return;
 		});
 }
@@ -110,8 +178,8 @@ function VerFicheroSeleccionado (){
 	// Variables reiniciadas
 	$ficheros = array();
 	$ficheroserroneos = array ();
-	if ($CantidadFicheros < 500) 
-	{
+	//~ if ($CantidadFicheros < 500) 
+	//~ {
 	// Si hay menos 500 archivos continuamos sino no
 	?>
 		<?php
@@ -150,7 +218,6 @@ function VerFicheroSeleccionado (){
 					// Hay el parametro error entonces continuamos con foreach.
 					$y= $y+1;
 					$ficheroserroneos [$y] = $DatosImagen;
-					echo 'Entro ..............................................';
 					continue;
 				default:
 					$x= $x+1;
@@ -165,7 +232,7 @@ function VerFicheroSeleccionado (){
 		 
 		 $DestinoRe =	$RutaServidor.$DirImagRecortadas;
 		
-	}?>
+	//~ }?>
 
 	<div class="container">
 		<div class="col-md-8">
@@ -248,22 +315,13 @@ function VerFicheroSeleccionado (){
 								?>
 								<tr>
 								<td class="rowCheckFichero"><input type="checkbox" name="checkFic<?php echo $x;?>" value="<?php echo $x;?>"></td>
-								<td><?php echo $imagen['nombre'];?></td>
-								<td><?php echo $imagen['extension'];?></td>
-								<td><?php echo $imagen['tipoimagen'];?></td>
-								<td><span id="<?php echo 'ancho-fic'.$x;?>"><?php echo $imagen['ancho'];?></span></td>
-								<td><span id="<?php echo 'alto-fic'.$x;?>"><?php echo $imagen['alto'];?></span></td>
-								<?php //Estado ponemos :
-								// Si no el fichero es un error.
-								// Si ya existe la miniatura
-								// Cuando se realiza , se pone hecha.
-								$Estado = "";
-								if  (!empty($imagen['error'])) 
-								{
-									$Estado = $imagen['error'];
-								}
-								?>					
-								<td><?php echo $Estado;?></td>
+								<td><span id="nombreFic<?php echo $x;?>"><?php echo $imagen['nombre'];?></span></td>
+								<td><span id="extensionFic<?php echo $x;?>"><?php echo $imagen['extension'];?></span></td>
+								<td><span id="tipoFic<?php echo $x;?>"><?php echo $imagen['tipoimagen'];?></span></td>
+								<td><span id="anchoFic<?php echo $x;?>"><?php echo $imagen['ancho'];?></span></td>
+								<td><span id="altoFic<?php echo $x;?>"><?php echo $imagen['alto'];?></span></td>
+								
+								<td><span id="estadoFic<?php echo $x;?>">Sin comprobar</span></td>
 
 								</tr>
 							<?php

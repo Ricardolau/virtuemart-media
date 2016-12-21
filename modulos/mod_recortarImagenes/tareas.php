@@ -13,20 +13,42 @@
 $pulsado = $_POST['pulsado'];
 
 
-// Incluimos funciones
+// Incluimos funciones y configuracion
+include ("./../../configuracion.php");
 include ("./funciones.php");
 
 
  
  switch ($pulsado) {
     case 'Redimensionar':
-		// Debería saber que fichero quiero redimensionar.
-		// comprobamos que check esta marcado.
-		
-		
-		$respuesta [0] = 'Debería saber que fichero';
+		// Ahora creamos los datos que vamos enviar a la funcion redimensionar de php.
+		$destino =	$RutaServidor.$DirImagRecortadas;
+		$imagen['checkID'] = $_POST['checkID'];
+		$imagen['nombre'] = $_POST['nombreFichero'];
+		$imagen['extension'] = substr($_POST['extensionFichero'], -3);
+		$imagen['rutafichero'] = $RutaServidor.$DirImagOriginales.$imagen['nombre'].$_POST['extensionFichero'];
+		$imagen['alto'] = $_POST['altoFichero'];
+		$imagen['ancho'] = $_POST['anchoFichero'];
+		$imagen['tipoimagen'] = $_POST['tipoFichero'];
+		// El tipo fichero :
+		// 	1 - Gif
+		//  2 - jpg o Jpeg
+		//  3 - png
+		if ($imagen['extension'] == 'gif') {
+			$imagen['tipofichero'] = 1;
+		}
+		if ($imagen['extension'] == 'jpg') {
+			$imagen['tipofichero'] = 2;
+		}
+		if ($imagen['extension'] == 'png') {
+			$imagen['tipofichero'] = 3;
+		}
+			
+		$sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
+		// Llamamos a la funcion de redimension
+		RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg);
 		header("Content-Type: application/json;charset=utf-8");
-		echo json_encode($respuesta);
+		echo json_encode($imagen);
 		
 		break;
     
