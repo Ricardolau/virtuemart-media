@@ -18,10 +18,10 @@ var altoFichero = [];
 function metodoClick(pulsado){
 	    console.log("Inicimos switch de control pulsar");
 	    switch(pulsado) {
-			case 'LimpiarCopiar':
-				console.log('Entro en LimpiarCopiar');
+			case 'Eliminar':
+				console.log('Eliminar');
 				// Cargamos variable global ar checkID = [];
-				LimpiarCopiar ();
+				Eliminar ();
 				break;
 			case 'Redimensionar':
 				// Primero deberíamos leer si tiene check marcados
@@ -54,10 +54,56 @@ function metodoClick(pulsado){
 				alert('Error pulsado incorrecto');
 			}
 }
-function LimpiarCopiar(){
-	var respuestaLimp = confirm('Vamos eliminar todos los ficheros redimensionados');
-	if (respuestaConf == true) {;
-		alert('Si');
+function Eliminar(){
+	// Antes de nada debemos ver cuanto tenemos seleccionado.
+	VerFicheroSeleccionado ()
+	console.log('Va preguntar');
+
+	if (checkID.length == 0 ){
+				var respuestaEliminar = confirm( 'No hay ninguno seleccionado, \n ¿ Quieres eliminar todos ?')
+				if (respuestaEliminar == true) {;
+				// Ahora deberiamos crear array de todos los check que aparecen en pantalla.( Tanto como si hay o no paginacion )
+				// Si hay paginación debería poder indicar de alguna forma todos o solo la pagina.
+				}
+	}
+	
+	if ((checkID.length > 0) || (respuestaEliminar == true)){
+		// Quiere decir que hay alguno seleccionado o todos.
+		// Antes de enviar , tendríamos que saberlo, es decir saber si son todas o solo 
+	// las seleccionadas, ya que el proceso es distinto.
+		if (respuestaEliminar == true) {;
+			
+			var parametros = {
+				'pulsado': 'EliminarTodos'
+				
+				};
+		} else {
+			var parametros = {
+				'pulsado': 'EliminarUno',
+				'checkID': checkID[i],
+				'nombreFichero': nombreFichero[i],
+				'extensionFichero': extensionFichero[i],
+				'tipoFichero': tipoFichero[i],
+				'altoFichero': altoFichero[i],
+				'anchoFichero': anchoFichero[i]
+				};
+		}
+		console.log('Va ejecutar ajax');
+		$.ajax({
+				data: parametros,
+				url: 'tareas.php',
+				type: 'post',
+				datatype: 'json',
+				beforeSend: function () {
+					$("#procesando").html('Eliminando miniaturas de imagenes');
+				},
+				success: function (response) {
+					$("#procesando").html('Terminando la eliminacion de miniaturas'+response);
+					
+					console.log(response);
+				}
+			});
+		
 	}
 }
 // Funcion para redimensionar imagenes
@@ -285,7 +331,7 @@ function VerFicheroSeleccionado (){
 				<input type="submit" value="Redimensionar" onclick="metodoClick('Redimensionar');"> 
 			</div>
 			<div class="col-md-6">
-				<input type="submit" value="Eliminar Redimensiones" onclick="metodoClick('LimpiarCopiar');"> 
+				<input type="submit" value="Eliminar Redimensiones" onclick="metodoClick('Eliminar');"> 
 			</div>
 			<?php // Funcion para recortar imagen
 			// RecortarImagenC ($imagen,$DestinoRe,$sufijo,$ImgAltoCfg, $ImgAnchoCfg)

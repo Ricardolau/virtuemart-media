@@ -177,7 +177,17 @@ function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 			imagedestroy($thumbail);
 	}
 
-
+	function EliminarTodos ($DestinoRe) {
+		//~ $salida= $DestinoRe;
+		$salida = shell_exec("rm ".$DestinoRe."*");
+		//~ echo '<script>';
+		//~ echo "console.log('";
+		//~ echo '<pre>'.$salida.'</pre>';
+		//~ echo '")';
+		//~ echo '</script>';
+		return $salida;
+		
+	}
 	
 ?>
 

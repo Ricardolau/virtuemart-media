@@ -51,7 +51,12 @@ include ("./funciones.php");
 		echo json_encode($imagen);
 		
 		break;
-    
+	case 'EliminarTodos':
+		$DestinoRe =	$RutaServidor.$DirImagRecortadas;
+		// Eliminamos todas la miniaturas.
+		$salida = EliminarTodos($DestinoRe);
+		
+	break;
     
 }
  
