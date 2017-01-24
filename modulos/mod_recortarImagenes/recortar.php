@@ -29,21 +29,9 @@ function metodoClick(pulsado){
 				// Comprobamos seleccion
 				VerFicheroSeleccionado ();
 				if (checkID.length == 0 ){
-					var respuestaCheck = confirm( 'No hay ninguno seleccionado, \n ¿ Quieres redimensionar todas ?');
-					
-					if (respuestaCheck == true ) {
-					// Queremos redimensionar todas, los vamos hacer es:
-					// Lo primero que debemos hacer saber si estamos en la pagina de inicio.
-					// Luego Marcartodas() para redimensionar, hacerlo..
-					// y luego pasara a la pagina siguiente
-					// Así hasta el final.
-					MarcarTodas();
-						
-					}
-				
-				
-				// Ahora deberiamos crear array de todos los check que aparecen en pantalla.( Tanto como si hay o no paginacion )
-				// Si hay paginación debería poder indicar de alguna forma todos o solo la pagina.
+					alert( 'No hay ninguno seleccionado, \n ¿ Debes seleccionar que ficheros quieres redimensionar ?');
+					// Volvemos
+					return;			
 				}
 				// Funcion para redimensionar
 				if (checkID.length > 0) {
@@ -402,11 +390,10 @@ function VerFicheroSeleccionado (){
 		</div>
 		<div class="col-md-4">
 			<h2>Procesando</h2>
-			<p>Aquí indicaremos lo que estamos realizando y hemos comprobado. El problema que encuentro, es como hacerlos si AJAX o con antes de cargar el html</p>
-			<p>El primer caso es interesante para ganar rapidez, el problema es que se va repetir cada vez que recarguemos la pagina.</p>
+			<p>Indicamos las comprobaciones totales de los ficheros que encontramos en Banco Fotos.</p>
 			<div>Ficheros encontrados en Origen: <span class="label label-default"><?php echo count($files);?></span></div>
 			<div>Ficheros encontrados en Redimension: <span class="label label-default"><?php echo $CantidadMiniaturas;?></span></div>
-
+			<div class="alert alert-info"><p> El resto de comprobaciones me queda pendiente realizar <strong>"expresion regular"</strong> para ejecutar ls</p></div>
 			<h4>Proceso</h4>
 			<p>Aquí debería estar barra proceso.</p>
 			<div id="procesando">INACTIVO</div>
@@ -415,14 +402,10 @@ function VerFicheroSeleccionado (){
 		</div>
 		<div class="col-md-12">
 			
-			<div style="float:left;margin-left:20px;">Imagenes <span class="label label-default"><?php echo count($ficheros);?></span></div>
 			
-			<div style="float:left;margin-left:20px;">
-				<a href="#ListadoFicherosErroneos" onclick="metodoClick('ListaFicherosErroneos');">No imagenes <span class="badge"><?php echo count($ficheroserroneos);?></span></a>
-			</div>
 			<div><hr></div>
 			<div id="ListadoFicherosTratar">
-			<h2>Listado de imagenes a tratar</h2>
+			<h3>Opciones a realizar</h3>
 
 			<div class="col-md-6">
 				<input type="submit" value="Crear Miniatura" onclick="metodoClick('Redimensionar');"> 
@@ -430,10 +413,18 @@ function VerFicheroSeleccionado (){
 			<div class="col-md-6">
 				<input type="submit" value="Eliminar Miniaturas" onclick="metodoClick('Eliminar');"> 
 			</div>
+			
 			<?php  // Mostramos el paginado. 
 			echo $htmlPG; 
 			?>
-
+			<h3>Comprobacion de esta pagina</h3>
+			<div style="float:left;margin-left:20px;">Imagenes <span class="label label-default"><?php echo count($ficheros);?></span></div>
+			
+			<div style="float:left;margin-left:20px;">
+				<a href="#ListadoFicherosErroneos" onclick="metodoClick('ListaFicherosErroneos');">No imagenes <span class="badge"><?php echo count($ficheroserroneos);?></span></a>
+			</div>
+			
+			
 			<div class="ficheros-tratar">
 			<table class="table">
 				<thead>
