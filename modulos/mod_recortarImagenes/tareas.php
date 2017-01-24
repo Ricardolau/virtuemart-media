@@ -55,6 +55,20 @@ include ("./funciones.php");
 		$DestinoRe =	$RutaServidor.$DirImagRecortadas;
 		// Eliminamos todas la miniaturas.
 		$salida = EliminarTodos($DestinoRe);
+		break;
+	case 'EliminarUno':
+		$DestinoRe =	$RutaServidor.$DirImagRecortadas;
+		$checkID = $_POST['checkID'];
+		$imagen['nombre'] = $_POST['nombreFichero'];
+		$imagen['nombre'] = $imagen['nombre'].'_'.$ImgAnchoCfg.'x'.$ImgAltoCfg.$_POST['extensionFichero'];
+		$imagen['rutafichero'] = $DestinoRe.$imagen['nombre'];
+		// Eliminanos UNA miniatura
+		
+		EliminarUno($imagen['rutafichero']);
+		
+		header("Content-Type: application/json;charset=utf-8");
+		echo json_encode($checkID);
+		break;	
 		
 	break;
     

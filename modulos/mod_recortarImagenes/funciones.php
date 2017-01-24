@@ -65,7 +65,7 @@ function DatosImagen ($imagen)
 
 				}// Cierro if comprueba si es imagen
 		} else {
-				
+				// Aquí no debería llegar nunca..
 				$respuesta = array(
 					'nombre'	=> $NombreFichero,
 					'error' => "No existe fichero"
@@ -177,17 +177,25 @@ function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 			imagedestroy($thumbail);
 	}
 
-	function EliminarTodos ($DestinoRe) {
-		//~ $salida= $DestinoRe;
+function EliminarTodos ($DestinoRe) {
+		// Eliminamos todas las miniaturas.
 		$salida = shell_exec("rm ".$DestinoRe."*");
-		//~ echo '<script>';
-		//~ echo "console.log('";
-		//~ echo '<pre>'.$salida.'</pre>';
-		//~ echo '")';
-		//~ echo '</script>';
-		return $salida;
 		
-	}
+		return ;
+		
+}
+	
+function EliminarUno ($imagen) {
+		// Eliminamo uno a uno las miniaturas.
+		$salida = shell_exec("rm '".$imagen."'");
+		
+		return;
+		
+}
+
+
+
+
 	
 ?>
 
