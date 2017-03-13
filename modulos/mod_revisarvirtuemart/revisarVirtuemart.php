@@ -40,24 +40,23 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
  // Inicializamos varibles
  $ficheros = array ();
  //Creamos array de ficheros que existene en el directorio
-   $files = filesProductos($RutaServidor,$DirInstVirtuemart);
+   $files = filesProductos($RutaServidor,$DirImageProdVirtue);
  // Ahora de momento no lo hacemos, pero esto debe hacer con AJAX , ya que pueden ser muchas imagenes y tendremos que ir añadiendo 
  // a medida que se van procesando, para no bloquear el servidor o la web.
-   $ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
+  $ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
  
- //  Files es un array con solo ficheros del directorio que indicamos.
+ // Ahora ponemos valor variable ficheroerror
+ if ($ficheros['NFicherosNoEncontrados']) {
+		$ficheroerror = $ficheros['NFicherosNoEncontrados'];
+	} else {
+		$ficheroerror = 0;
+	}
  
- // Ahora buscamos en basedatos la imagen.
- 
+ // Ahora buscamos en productos.
+ $productos = ProductosImagenMal($BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
  //~ echo '<pre>';
- 
- 
- 
- //~ echo 'FICHERO NO ENCONTRADOS MEDIA';
- 
- 
- //~ print_r($ficheros);
- 
+ //~ echo ' Algo';
+   //~ print_r($productos);
  //~ echo '</pre>';
  
 ?>
@@ -70,15 +69,20 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 			<li> Saber cuantas ficheros existen en el directorio asignado para las de los productos <span class="label label-default">Ficheros existentes</span></li>
 			<li> Saber cuantas ficheros no se encuentran tabla virtuemart_media. <span class="label label-default">Ficheros no encontrados</span></li>
 			<li> Saber cuales no se utilizan.<span class="label label-default">Imagenes no utiliza</span></li>
+			<li> Que productos no tiene imagen asignada.<span class="label label-default">Productos sin imagen</span></li>
+			<li> Cuantos productos tiene una imagen MAL asignada.<span class="label label-default">Productos con imagen MAL</span></li>
 			</ul> 
-			<h4>Procesos</h4>
+			<h4>Comprobaciones</h4>
+			<div>
 			<div style="float:left;margin-left:20px;">Ficheros existentes <span class="label label-default"><?php echo count($files);?></span></div>
-			<?php 
-			// Queda pendiente ver como contar los ficheros no encontrados y descontarlos en las Imagenes no utilizadas.
-			?>
-			<div style="float:left;margin-left:20px;">Ficheros no encontrados <span class="label label-default"><?php echo count($files);?></span></div>
+			<div style="float:left;margin-left:20px;">Ficheros no encontrados <span class="label label-default"><?php echo $ficheroerror;?></span></div>
 			<div style="float:left;margin-left:20px;">Imagenes no utilizas <span class="label label-default"><?php echo count($ficheros);?></span></div>
+			</div>
+			<div>
+			<div style="float:left;margin-left:20px;">Productos sin imagen <span class="label label-default"><?php echo $productos['SinIDMedia'];?></span></div>
+			<div style="float:left;margin-left:20px;">Productos con imagen MAL <span class="label label-default"><?php echo $productos['ErrorImagen'];?></span></div>
 			
+			</div>
 		</div>
 		<div class="col-md-4">
 			<h3>Pasos que realizamos</h3>
