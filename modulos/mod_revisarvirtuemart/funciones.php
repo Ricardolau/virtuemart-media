@@ -14,61 +14,79 @@
 	
 	/* Funcion que busca en tabla de medios virtuemart si el fichero existe o no.*/
 	function Datosficheros($files,$BDVirtuemart,$prefijoTabla) {
-	$contaError = 0;	
+	$contarError = 0;	
 	$x = 0;
 	$ficheros = array();
-	foreach ( $files as $file ){
-		
-		$fichero=utf8_encode(basename($file)); // Nombre de fichero con extension ..
-		// Ahora tenemos que añadirle directorio de sistema
-		$fichero = 'images/stories/virtuemart/product/'.$fichero;
-		//~ echo $fichero.'<br/>';
-		$consultaImgMedia = $BDVirtuemart->query( "SELECT `virtuemart_media_id`,`file_url` FROM `".$prefijoTabla."_virtuemart_medias` where `file_url`= '".$fichero."'");
-		if ($consultaImgMedia->num_rows == 0){
-			$x++;
-			$contaError++;
-			// Lo anotamos como error , ya que puede que exista, pero el nombre tenga caracteres extraños y no lo encuentre por eso. 
-			$ficheros[$x]['error'] = 'No existe en media';
-			$ficheros[$x]['Ruta'] = $file;
-		} else {
-			// Quiere decir que existe en media ..
-			$id_media = $consultaImgMedia->fetch_assoc();
-			$id_media = $id_media['virtuemart_media_id']; //obtenemos id que vamos buscar en product_media
-			// Ahora buscamos en product_media a ver si existe...
-			$consultaImgProd = $BDVirtuemart->query( "SELECT * FROM `".$prefijoTabla."_virtuemart_product_medias` WHERE `virtuemart_media_id` =".$id_media);
-				if ($consultaImgProd->num_rows == 0){
-					// Quiere decir que no existe en producto.
-					$x= $x +1;
-					$ficheros[$x]['aviso'] = 'No encuenta ID_media:'.$id_media.' en product_media';
-					$ficheros[$x]['Ruta'] = $file; 
-					$ficheros[$x]['IDmedia']= $id_media;
-					//~ echo $fichero. 'ID de media'.$id_media['virtuemart_media_id'].'<br/>';
-				}
+		foreach ( $files as $file ){
+			
+			$fichero=utf8_encode(basename($file)); // Nombre de fichero con extension ..
+			// Ahora tenemos que añadirle directorio de sistema
+			$fichero = 'images/stories/virtuemart/product/'.$fichero;
+			//~ echo $fichero.'<br/>';
+			$consultaImgMedia = $BDVirtuemart->query( "SELECT `virtuemart_media_id`,`file_url` FROM `".$prefijoTabla."_virtuemart_medias` where `file_url`= '".$fichero."'");
+			if ($consultaImgMedia->num_rows == 0){
+				$x++;
+				$contarError++;
+				// Lo anotamos como error , ya que puede que exista, pero el nombre tenga caracteres extraños y no lo encuentre por eso. 
+				$ficheros[$x]['error'] = 'No existe en media';
+				$ficheros[$x]['Ruta'] = $file;
+			} else {
+				// Quiere decir que existe en media ..
+				$id_media = $consultaImgMedia->fetch_assoc();
+				$id_media = $id_media['virtuemart_media_id']; //obtenemos id que vamos buscar en product_media
+				// Ahora buscamos en product_media a ver si existe...
+				$consultaImgProd = $BDVirtuemart->query( "SELECT * FROM `".$prefijoTabla."_virtuemart_product_medias` WHERE `virtuemart_media_id` =".$id_media);
+					if ($consultaImgProd->num_rows == 0){
+						// Quiere decir que no existe en producto.
+						$x= $x +1;
+						$ficheros[$x]['aviso'] = 'No encuenta ID_media:'.$id_media.' en product_media';
+						$ficheros[$x]['Ruta'] = $file; 
+						$ficheros[$x]['IDmedia']= $id_media;
+						//~ echo $fichero. 'ID de media'.$id_media['virtuemart_media_id'].'<br/>';
+					}
 			}
-		
+			
 		}
 		$ficheros['NFicherosNoEncontrados'] = $contarError ;
 		return $ficheros;	
 		
 	}
-	function ProductosImagenMal($BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor) {
+	function ObtenerProductos($BDVirtuemart,$prefijoTabla) {
 		$Productos = array();
 		// Consulta para obtener ID y Referencia Proveedor
 		$campos ="`virtuemart_product_id`,`product_gtin`";
 		$tabla = "_virtuemart_products";
 		$whereC = " ";
-		$Consulta = $BDVirtuemart->query( "SELECT ".$campos." FROM `".$prefijoTabla."_virtuemart_products` ".$whereC);
+		$Consulta = "SELECT ".$campos." FROM `".$prefijoTabla."_virtuemart_products` ".$whereC;
+		$Query = $BDVirtuemart->query($Consulta);
+		$i = 0;
+		if ($Query->num_rows > 0){
+			$Productos['TotalProductos'] = $Query->num_rows;	
+			while ($fila = $Query->fetch_assoc()) {
+				$i++;
+				$Productos[$i]['product_id'] = $fila['virtuemart_product_id'];
+				$Productos[$i]['product_gtin'] = $fila['product_gtin'];
+			}
 		
-		if ($Consulta->num_rows > 0){
-			// Quiere decir que encontro datos.
+		
+		} else { 
+			$Productos['ErrorConsulta'] = $Consulta;
+		}
+		return $Productos;
+	}
+	
+	
+	
+	
+	function ProductosImagenMal($Productos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor) {
+		
+		if ($Productos['TotalProductos']){
+			// Quiere decir que envio productos.
 			$i = 0;
 			// Montamos array con id media....todos los productos.
 			$campos = "`virtuemart_product_id`, `virtuemart_media_id`";
 			$tabla = "_virtuemart_product_medias";
-			while ($fila = $Consulta->fetch_assoc()) {
-				$i++;
-				$Productos[$i]['product_id'] = $fila['virtuemart_product_id'];
-				$Productos[$i]['product_gtin'] = $fila['product_gtin'];
+			for ( $i=1 ; $i <= $Productos['TotalProductos']; $i++) {
 				// Ahora buscamos tabla product_medias el id de media.
 				$whereC = " WHERE virtuemart_product_id=".$Productos[$i]['product_id'];
 				$Consulta2 = $BDVirtuemart->query("SELECT ".$campos." FROM ".$prefijoTabla.$tabla.$whereC);
@@ -117,7 +135,8 @@
 			}
 			
 		}
-		$Productos['TotalProductos'] = count($Productos);	
+		
+		
 		$Productos['ConIDMedia'] = $conImagenes;
 		$Productos['SinIDMedia'] = $Productos['TotalProductos']-$Productos['ConIDMedia'];
 		$Productos['ErrorImagen'] = $ErrorImagenes;

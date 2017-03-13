@@ -27,9 +27,11 @@
 <?php 
 	include './../../header.php';
 ?>
+    <script src="<?php echo $HostNombre; ?>/modulos/mod_revisarvirtuemart/funciones.js"></script>
+
+
 <?php
  // Variable de inicio y entorno:
-
 $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
  
 // Recuerda que header.php incluimos el fichero de configuración 
@@ -40,7 +42,7 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
  // Inicializamos varibles
  $ficheros = array ();
  //Creamos array de ficheros que existene en el directorio
-   $files = filesProductos($RutaServidor,$DirImageProdVirtue);
+ $files = filesProductos($RutaServidor,$DirImageProdVirtue);
  // Ahora de momento no lo hacemos, pero esto debe hacer con AJAX , ya que pueden ser muchas imagenes y tendremos que ir añadiendo 
  // a medida que se van procesando, para no bloquear el servidor o la web.
   $ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
@@ -51,11 +53,19 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 	} else {
 		$ficheroerror = 0;
 	}
+
+ // Ahora obtenemos productos.
+ $TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
+ // Ahora compramos cuantos productos obtenemos y si hubo un error.
  
- // Ahora buscamos en productos.
- $productos = ProductosImagenMal($BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
+ if (isset($TodosProductos['ErrorConsulta'])){
+	echo '<div class= "container"><h4>Hubo un error de conexion con la base de datos o no hay articulos pasados</h4>';
+	echo '<p>'.$TodosProductos['ErrorConsulta'].'</p></div>';
+	exit;
+}
+
+ //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
  //~ echo '<pre>';
- //~ echo ' Algo';
    //~ print_r($productos);
  //~ echo '</pre>';
  
@@ -79,8 +89,8 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 			<div style="float:left;margin-left:20px;">Imagenes no utilizas <span class="label label-default"><?php echo count($ficheros);?></span></div>
 			</div>
 			<div>
-			<div style="float:left;margin-left:20px;">Productos sin imagen <span class="label label-default"><?php echo $productos['SinIDMedia'];?></span></div>
-			<div style="float:left;margin-left:20px;">Productos con imagen MAL <span class="label label-default"><?php echo $productos['ErrorImagen'];?></span></div>
+			<div style="float:left;margin-left:20px;">Productos sin imagen <span id="PSImagen" class="label label-default"> ? </span></div>
+			<div style="float:left;margin-left:20px;">Productos con imagen MAL <span id="PMImagen" class="label label-default">? </span></div>
 			
 			</div>
 		</div>
@@ -95,7 +105,8 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 				<li> ELiminamos imagen y miniatura si existe ( de momento solo mostramos en pantalla)</li>
 				</ul>
 			</ul>		
-			
+			<div id="proceso">
+			</div>
 			
 			
 			
@@ -172,9 +183,18 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 			
 			
 			</div>
-		
-	
 	</div>
+	 <script>
+         //~ // Se ejecuta cuando termina de carga toda la pagina.
+            $(document).ready(function () {
+                comprobarProductos();
+                
+            });
+        </script>
+        
+	
+	
+	
 	
 </body>
 </html>
