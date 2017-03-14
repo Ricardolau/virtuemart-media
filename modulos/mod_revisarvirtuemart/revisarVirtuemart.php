@@ -26,6 +26,8 @@
 <body>
 <?php 
 	include './../../header.php';
+	 include 'funciones.php';
+
 ?>
     <script src="<?php echo $HostNombre; ?>/modulos/mod_revisarvirtuemart/funciones.js"></script>
 
@@ -37,24 +39,30 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 // Recuerda que header.php incluimos el fichero de configuración 
 	
 // Incluimos fichero funciones
- include 'funciones.php';
  
  // Inicializamos varibles
  $ficheros = array ();
  //Creamos array de ficheros que existene en el directorio
- $files = filesProductos($RutaServidor,$DirImageProdVirtue);
- // Ahora de momento no lo hacemos, pero esto debe hacer con AJAX , ya que pueden ser muchas imagenes y tendremos que ir añadiendo 
- // a medida que se van procesando, para no bloquear el servidor o la web.
-  $ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
- 
- // Ahora ponemos valor variable ficheroerror
- if ($ficheros['NFicherosNoEncontrados']) {
-		$ficheroerror = $ficheros['NFicherosNoEncontrados'];
-	} else {
-		$ficheroerror = 0;
-	}
-
- // Ahora obtenemos productos.
+ $Tfiles = filesProductos($RutaServidor,$DirImageProdVirtue); 
+ $Nfiles = count($Tfiles);
+// Comprobamos si hay muchos ficheros ya que si son mucho.
+// si hay mas 50 ficheros puede tardar en cargar.
+// por ello solo cargamos 50 ficheros, el problema 
+// si queremos ordenados todos por ID media,
+// de momento ordeno solo los 50 que presentamos. 
+if ($Nfiles > 500) {
+ //~ // Lo que hago es solo reco
+ $files = array_slice($Tfiles, 0, 500);
+ //~ 
+} 
+$ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
+ 	 // Ahora ponemos valor variable ficheroerror
+	 if ($ficheros['NFicherosNoEncontrados']) {
+			$ficheroerror = $ficheros['NFicherosNoEncontrados'];
+		} else {
+			$ficheroerror = 0;
+		} 
+// Ahora obtenemos productos.
  $TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
  // Ahora compramos cuantos productos obtenemos y si hubo un error.
  
@@ -62,12 +70,15 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 	echo '<div class= "container"><h4>Hubo un error de conexion con la base de datos o no hay articulos pasados</h4>';
 	echo '<p>'.$TodosProductos['ErrorConsulta'].'</p></div>';
 	exit;
-}
+}	
+
+ $IDficheros = ObtenerDatosficheros( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart );
+
 
  //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
- //~ echo '<pre>';
-   //~ print_r($productos);
- //~ echo '</pre>';
+ echo '<pre>';
+   print_r($RutaServidor.$DirInstVirtuemart);
+ echo '</pre>';
  
 ?>
 
@@ -84,12 +95,12 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 			</ul> 
 			<h4>Comprobaciones</h4>
 			<div>
-			<div style="float:left;margin-left:20px;">Ficheros existentes <span class="label label-default"><?php echo count($files);?></span></div>
+			<div style="float:left;margin-left:20px;">Ficheros existentes <span class="label label-default"><?php echo $Nfiles;?></span></div>
 			<div style="float:left;margin-left:20px;">Ficheros no encontrados <span class="label label-default"><?php echo $ficheroerror;?></span></div>
 			<div style="float:left;margin-left:20px;">Imagenes no utilizas <span class="label label-default"><?php echo count($ficheros);?></span></div>
 			</div>
 			<div>
-			<div style="float:left;margin-left:20px;">Productos sin imagen <span id="PSImagen" class="label label-default"> ? </span></div>
+			<div style="float:left;margin-left:20px;">Productos sin imagen <a id="LinkPSImagen" style="display:none" href="./vistaSinImagen.php"><span id="PSImagen" class="label label-default"> ? </span></a></div>
 			<div style="float:left;margin-left:20px;">Productos con imagen MAL <span id="PMImagen" class="label label-default">? </span></div>
 			
 			</div>
@@ -134,9 +145,6 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 				array_multisort($ID, SORT_ASC, $ficheros);
 				
 				
-				
-				// de momento lo dejo asi ,pero no es la correcta.
-				//~ natsort($ficheros);
 				
 				
 				$x=0;

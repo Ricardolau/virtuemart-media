@@ -28,6 +28,7 @@ $pulsado = $_POST['pulsado'];
         header("Content-Type: application/json;charset=utf-8");
 		echo json_encode($productos);
         break;
+	
 }
  
 /* ===============  CERRAMOS CONEXIONES  ===============*/
