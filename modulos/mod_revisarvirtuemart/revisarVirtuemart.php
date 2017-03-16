@@ -72,12 +72,15 @@ $ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
 	exit;
 }	
 
- $IDficheros = ObtenerDatosficheros( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart );
-
+ $IDficheros = ObtenerDatosficheros( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla );
+// Obtenemos el valores de [Existe] y de [virtuemart_product_id]
+$ArrayExiste = array_column($IDficheros, 'Existe');
+$ArrayId = array_column($IDficheros, 'virtuemart_product_id');
 
  //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
  echo '<pre>';
-   print_r($RutaServidor.$DirInstVirtuemart);
+   print_r($ArrayExiste);
+   print_r($ArrayId);
  echo '</pre>';
  
 ?>
