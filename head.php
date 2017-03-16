@@ -10,9 +10,10 @@
 <link rel="stylesheet" href="<?php echo $HostNombre;?>/css/bootstrap.min.css" type="text/css">
 <link rel="stylesheet" href="<?php echo $HostNombre;?>/css/template.css" type="text/css">
 
+
 <!--
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
--->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+-->
+<script src="<?php echo $HostNombre;?>/js/jquery-2.2.5-pre.min.js"></script>
 <script src="<?php echo $HostNombre;?>/js/bootstrap.min.js"></script>
 

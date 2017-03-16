@@ -26,39 +26,59 @@
 <body>
 <?php 
 	include './../../header.php';
+	 include 'funciones.php';
+
 ?>
+    <script src="<?php echo $HostNombre; ?>/modulos/mod_revisarvirtuemart/funciones.js"></script>
+
+
 <?php
  // Variable de inicio y entorno:
-
 $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
  
 // Recuerda que header.php incluimos el fichero de configuración 
 	
 // Incluimos fichero funciones
- include 'funciones.php';
  
  // Inicializamos varibles
  $ficheros = array ();
  //Creamos array de ficheros que existene en el directorio
-   $files = filesProductos($RutaServidor,$DirInstVirtuemart);
- // Ahora de momento no lo hacemos, pero esto debe hacer con AJAX , ya que pueden ser muchas imagenes y tendremos que ir añadiendo 
- // a medida que se van procesando, para no bloquear el servidor o la web.
-   $ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
+ $Tfiles = filesProductos($RutaServidor,$DirImageProdVirtue); 
+ $Nfiles = count($Tfiles);
+// Comprobamos si hay muchos ficheros ya que si son mucho.
+// si hay mas 50 ficheros puede tardar en cargar.
+// por ello solo cargamos 50 ficheros, el problema 
+// si queremos ordenados todos por ID media,
+// de momento ordeno solo los 50 que presentamos. 
+if ($Nfiles > 500) {
+ //~ // Lo que hago es solo reco
+ $files = array_slice($Tfiles, 0, 500);
+ //~ 
+} 
+$ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
+ 	 // Ahora ponemos valor variable ficheroerror
+	 if ($ficheros['NFicherosNoEncontrados']) {
+			$ficheroerror = $ficheros['NFicherosNoEncontrados'];
+		} else {
+			$ficheroerror = 0;
+		} 
+// Ahora obtenemos productos.
+ $TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
+ // Ahora compramos cuantos productos obtenemos y si hubo un error.
  
- //  Files es un array con solo ficheros del directorio que indicamos.
- 
- // Ahora buscamos en basedatos la imagen.
- 
- //~ echo '<pre>';
- 
- 
- 
- //~ echo 'FICHERO NO ENCONTRADOS MEDIA';
- 
- 
- //~ print_r($ficheros);
- 
- //~ echo '</pre>';
+ if (isset($TodosProductos['ErrorConsulta'])){
+	echo '<div class= "container"><h4>Hubo un error de conexion con la base de datos o no hay articulos pasados</h4>';
+	echo '<p>'.$TodosProductos['ErrorConsulta'].'</p></div>';
+	exit;
+}	
+
+ $IDficheros = ObtenerDatosficheros( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart );
+
+
+ //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
+ echo '<pre>';
+   print_r($RutaServidor.$DirInstVirtuemart);
+ echo '</pre>';
  
 ?>
 
@@ -70,15 +90,20 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 			<li> Saber cuantas ficheros existen en el directorio asignado para las de los productos <span class="label label-default">Ficheros existentes</span></li>
 			<li> Saber cuantas ficheros no se encuentran tabla virtuemart_media. <span class="label label-default">Ficheros no encontrados</span></li>
 			<li> Saber cuales no se utilizan.<span class="label label-default">Imagenes no utiliza</span></li>
+			<li> Que productos no tiene imagen asignada.<span class="label label-default">Productos sin imagen</span></li>
+			<li> Cuantos productos tiene una imagen MAL asignada.<span class="label label-default">Productos con imagen MAL</span></li>
 			</ul> 
-			<h4>Procesos</h4>
-			<div style="float:left;margin-left:20px;">Ficheros existentes <span class="label label-default"><?php echo count($files);?></span></div>
-			<?php 
-			// Queda pendiente ver como contar los ficheros no encontrados y descontarlos en las Imagenes no utilizadas.
-			?>
-			<div style="float:left;margin-left:20px;">Ficheros no encontrados <span class="label label-default"><?php echo count($files);?></span></div>
+			<h4>Comprobaciones</h4>
+			<div>
+			<div style="float:left;margin-left:20px;">Ficheros existentes <span class="label label-default"><?php echo $Nfiles;?></span></div>
+			<div style="float:left;margin-left:20px;">Ficheros no encontrados <span class="label label-default"><?php echo $ficheroerror;?></span></div>
 			<div style="float:left;margin-left:20px;">Imagenes no utilizas <span class="label label-default"><?php echo count($ficheros);?></span></div>
+			</div>
+			<div>
+			<div style="float:left;margin-left:20px;">Productos sin imagen <a id="LinkPSImagen" style="display:none" href="./vistaSinImagen.php"><span id="PSImagen" class="label label-default"> ? </span></a></div>
+			<div style="float:left;margin-left:20px;">Productos con imagen MAL <span id="PMImagen" class="label label-default">? </span></div>
 			
+			</div>
 		</div>
 		<div class="col-md-4">
 			<h3>Pasos que realizamos</h3>
@@ -91,7 +116,8 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 				<li> ELiminamos imagen y miniatura si existe ( de momento solo mostramos en pantalla)</li>
 				</ul>
 			</ul>		
-			
+			<div id="proceso">
+			</div>
 			
 			
 			
@@ -119,9 +145,6 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 				array_multisort($ID, SORT_ASC, $ficheros);
 				
 				
-				
-				// de momento lo dejo asi ,pero no es la correcta.
-				//~ natsort($ficheros);
 				
 				
 				$x=0;
@@ -168,9 +191,18 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 			
 			
 			</div>
-		
-	
 	</div>
+	 <script>
+         //~ // Se ejecuta cuando termina de carga toda la pagina.
+            $(document).ready(function () {
+                comprobarProductos();
+                
+            });
+        </script>
+        
+	
+	
+	
 	
 </body>
 </html>
