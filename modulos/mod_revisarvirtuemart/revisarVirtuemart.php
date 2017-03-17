@@ -52,9 +52,11 @@ $sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
 // de momento ordeno solo los 50 que presentamos. 
 if ($Nfiles > 500) {
  //~ // Lo que hago es solo reco
- $files = array_slice($Tfiles, 0, 500);
+	$files = array_slice($Tfiles, 0, 500);
  //~ 
-} 
+} else {
+	$files = $Tfiles;
+}
 $ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
  	 // Ahora ponemos valor variable ficheroerror
 	 if ($ficheros['NFicherosNoEncontrados']) {
@@ -72,15 +74,17 @@ $ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
 	exit;
 }	
 
- $IDficheros = ObtenerDatosficheros( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla );
+$IDficheros = ObtenerDatosficheros( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla );
 // Obtenemos el valores de [Existe] y de [virtuemart_product_id]
-$ArrayExiste = array_column($IDficheros, 'Existe');
-$ArrayId = array_column($IDficheros, 'virtuemart_product_id');
+$CArrayExiste = array_count_values(array_column($IDficheros, 'Existe'));// Creamos array suma de resultados
+$ArrayId = array_count_values(array_column($IDficheros, 'virtuemart_product_id'));
+
 
  //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
  echo '<pre>';
-   print_r($ArrayExiste);
-   print_r($ArrayId);
+   print_r($CArrayExiste['no']);
+   //~ print_r(array_count_values($ArrayExiste));
+   print_r($IDficheros);
  echo '</pre>';
  
 ?>
@@ -90,20 +94,22 @@ $ArrayId = array_column($IDficheros, 'virtuemart_product_id');
 			<h1>Analizamos las imagenes de productos de virtuemart</h1>
 			<p>El objetivo es saber: </p>
 			<ul> 
-			<li> Saber cuantas ficheros existen en el directorio asignado para las de los productos <span class="label label-default">Ficheros existentes</span></li>
-			<li> Saber cuantas ficheros no se encuentran tabla virtuemart_media. <span class="label label-default">Ficheros no encontrados</span></li>
-			<li> Saber cuales no se utilizan.<span class="label label-default">Imagenes no utiliza</span></li>
-			<li> Que productos no tiene imagen asignada.<span class="label label-default">Productos sin imagen</span></li>
-			<li> Cuantos productos tiene una imagen MAL asignada.<span class="label label-default">Productos con imagen MAL</span></li>
+			<li> <strong>Ficheros existentes:</strong> Cuantos ficheros existen en el directorio asignado a productos.</li>
+			<li> <strong>Ficheros No imagenes:</strong> Cuantos de esos ficheros no son imagenes o formato incorrecto. </li>
+			<li> <strong>Ficheros No existen Media</strong>Saber cuantas ficheros no se encuentran tabla virtuemart_media.</li>
+			<li> <strong>Registros Media:</strong> Cuantos registros hay en virtuemart_media que tipo producto.</li>
+			<li> <strong>Registros no utiliza:</strong> Saber cuantos registros de virtuemart_media de tipo product no se utilizan.</li>
+			<li> <strong>Productos sin imagen:</strong>Que productos no tiene imagen asignada.</li>
+			<li> <strong>Productos tiene Imagen Mal:</strong>Cuantos productos tiene una imagen MAL asignada, no existe.</li>
 			</ul> 
 			<h4>Comprobaciones</h4>
 			<div>
 			<div style="float:left;margin-left:20px;">Ficheros existentes <span class="label label-default"><?php echo $Nfiles;?></span></div>
 			<div style="float:left;margin-left:20px;">Ficheros no encontrados <span class="label label-default"><?php echo $ficheroerror;?></span></div>
-			<div style="float:left;margin-left:20px;">Imagenes no utilizas <span class="label label-default"><?php echo count($ficheros);?></span></div>
+			<div style="float:left;margin-left:20px;">Imagenes no utilizas <span class="label label-default"><?php echo	$ArrayId[0];?></span></div>
 			</div>
 			<div>
-			<div style="float:left;margin-left:20px;">Productos sin imagen <a id="LinkPSImagen" style="display:none" href="./vistaSinImagen.php"><span id="PSImagen" class="label label-default"> ? </span></a></div>
+			<div style="float:left;margin-left:20px;">Productos sin imagen <a id="LinkPSImagen" style="display:none" href="./vistaSinImagen.php"><span id="PSImagen" class="label label-default"> <?php echo	$ArrayId[0];?> </span></a></div>
 			<div style="float:left;margin-left:20px;">Productos con imagen MAL <span id="PMImagen" class="label label-default">? </span></div>
 			
 			</div>

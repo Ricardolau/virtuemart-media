@@ -176,49 +176,51 @@
 		return $respuesta;
 	}
 	
-	function ObtenerDatosficheros($files,$BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla) {
-	// Que imagenes hay virtuemart_media_id y no se utilizan en virtuemart_product_medias, pero que 
-	// esa imagen este en directorio imagenes de productos.
-	$IdArray = array();
-	$ArrayIDMedia = array();
-	//~ $Consulta = 'SELECT `virtuemart_media_id`,`file_url` FROM `xcv7n_virtuemart_medias` WHERE `file_type`="product" ORDER BY `virtuemart_media_id` ASC';
-	$ConsultaRelacionada = 'SELECT M.virtuemart_media_id,M.file_url,P.virtuemart_product_id FROM '.$prefijoTabla.'_virtuemart_product_medias P inner join '.$prefijoTabla.'_virtuemart_medias M On M.virtuemart_media_id=P.virtuemart_media_id WHERE M.file_type="product" ORDER BY M.virtuemart_media_id ASC ';
-	$MediaProducts = $BDVirtuemart->query($ConsultaRelacionada);
-	//~ $IdArray = $MediaProducts;
-	$i = 0;
-	while ($MediaProduct = $MediaProducts->fetch_assoc()){
-		$IdArray[$i] = $MediaProduct ;
+	function ObtenerDatosficheros($files,$BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla) 
+	{
+		// Que imagenes hay virtuemart_media_id y no se utilizan en virtuemart_product_medias, pero que 
+		// esa imagen este en directorio imagenes de productos.
+		$IdArray = array();
+		$ArrayIDMedia = array();
+		//~ $Consulta = 'SELECT `virtuemart_media_id`,`file_url` FROM `xcv7n_virtuemart_medias` WHERE `file_type`="product" ORDER BY `virtuemart_media_id` ASC';
+		$ConsultaRelacionada = 'SELECT M.virtuemart_media_id,M.file_url,P.virtuemart_product_id FROM '.$prefijoTabla.'_virtuemart_product_medias P inner join '.$prefijoTabla.'_virtuemart_medias M On M.virtuemart_media_id=P.virtuemart_media_id WHERE M.file_type="product" ORDER BY M.virtuemart_media_id ASC ';
+		$MediaProducts = $BDVirtuemart->query($ConsultaRelacionada);
+		//~ $IdArray = $MediaProducts;
+		$i = 0;
+		while ($MediaProduct = $MediaProducts->fetch_assoc()){
+			$IdArray[$i] = $MediaProduct ;
+			$i++;
+			
+		}
+		// Ahora tenemos un $IdArray con los ficheros que existen en productos.
+		// Ejemplo array:
+		// [0] => Array
+		//   (
+		//      [virtuemart_media_id] => 3
+		//      [file_url] => images/stories/virtuemart/product/A110205.jpg
+		//      [virtuemart_product_id] => 207
+		//  )
+		// Donde $RutaServidor.$DirInstVirtuemart./file_url es igual  array $files con  [1] => /home/antonio/www/multipiezas/images/stories/virtuemart/product/A110205.jpg
+		
+		$i=0;
+		$IdArray['NumeroFiles']= count($files);
+		foreach ($IdArray as $ID){
+			$encontrado = 'no';
+			$url = $RutaServidor.$DirInstVirtuemart.'/'.$ID['file_url'];
+			$IdArray[$i]['Url'] = $url;
+			foreach ($files as $file )	{
+				if ($file== $url) { 
+				$encontrado ='si';
+				break;
+				}
+			}
+		$IdArray[$i]['Existe'] = $encontrado;
 		$i++;
 		
-	}
-	// Ahora tenemos un $IdArray con los ficheros que existen en productos.
-	// Ejemplo array:
-	// [0] => Array
-    //   (
-    //      [virtuemart_media_id] => 3
-    //      [file_url] => images/stories/virtuemart/product/A110205.jpg
-    //      [virtuemart_product_id] => 207
-    //  )
-	// Donde $RutaServidor.$DirInstVirtuemart./file_url es igual  array $files con  [1] => /home/antonio/www/multipiezas/images/stories/virtuemart/product/A110205.jpg
-	
-	$i=0;
-	$IdArray['NumeroFiles']= count($files);
-	foreach ($IdArray as $ID){
-		$encontrado = 'no';
-		foreach ($files as $file )	{
-			$url = $RutaServidor.$DirInstVirtuemart.'/'.$ID['file_url'];
-			if ($file== $url) { 
-			$encontrado ='si';
-			break;
-			}
-		}
-	$IdArray[$i]['Existe'] = $encontrado;
-	$i++;
-	
+		}	
+			
+		return $IdArray;	
 	}	
-		
-	return $IdArray;	
-}	
 	
 	
 ?>
