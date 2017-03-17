@@ -24,9 +24,9 @@ $pulsado = $_POST['pulsado'];
    
     case 'comprobarProductos':
         $TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
-        $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
+        //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
         header("Content-Type: application/json;charset=utf-8");
-		echo json_encode($productos);
+		echo json_encode( $Todosproductos);
         break;
 	
 }

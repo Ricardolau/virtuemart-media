@@ -11,67 +11,68 @@
 	return $files ;
 	}
 	
-	
-	/* Funcion que busca en tabla de medios virtuemart si el fichero existe o no.*/
-	function Datosficheros($files,$BDVirtuemart,$prefijoTabla) {
-	$contarError = 0;	
-	$x = 0;
-	$ficheros = array();
-		foreach ( $files as $file ){
-			
-			$fichero=utf8_encode(basename($file)); // Nombre de fichero con extension ..
-			// Ahora tenemos que añadirle directorio de sistema
-			$fichero = 'images/stories/virtuemart/product/'.$fichero;
-			//~ echo $fichero.'<br/>';
-			$consultaImgMedia = $BDVirtuemart->query( "SELECT `virtuemart_media_id`,`file_url` FROM `".$prefijoTabla."_virtuemart_medias` where `file_url`= '".$fichero."'");
-			if ($consultaImgMedia->num_rows == 0){
-				$x++;
-				$contarError++;
-				// Lo anotamos como error , ya que puede que exista, pero el nombre tenga caracteres extraños y no lo encuentre por eso. 
-				$ficheros[$x]['error'] = 'No existe en media';
-				$ficheros[$x]['Ruta'] = $file;
-			} else {
-				// Quiere decir que existe en media ..
-				$id_media = $consultaImgMedia->fetch_assoc();
-				$id_media = $id_media['virtuemart_media_id']; //obtenemos id que vamos buscar en product_media
-				// Ahora buscamos en product_media a ver si existe...
-				$consultaImgProd = $BDVirtuemart->query( "SELECT * FROM `".$prefijoTabla."_virtuemart_product_medias` WHERE `virtuemart_media_id` =".$id_media);
-					if ($consultaImgProd->num_rows == 0){
-						// Quiere decir que no existe en producto.
-						$x= $x +1;
-						$ficheros[$x]['aviso'] = 'No encuenta ID_media:'.$id_media.' en product_media';
-						$ficheros[$x]['Ruta'] = $file; 
-						$ficheros[$x]['IDmedia']= $id_media;
-						//~ echo $fichero. 'ID de media'.$id_media['virtuemart_media_id'].'<br/>';
-					}
-			}
-			
-		}
-		$ficheros['NFicherosNoEncontrados'] = $contarError ;
-		return $ficheros;	
-		
-	}
 	function ObtenerProductos($BDVirtuemart,$prefijoTabla) {
+		// Obtenemos:
+		// 	1.- ID de producto
+		//	2.- Referencia Proveedor del Producto ( Multipiezas se utiliza ) 
+		//  3.- ID Multimedia ( Si hay pone 0)
+		// Teniendo en cuenta que repite ID producto si hay varias imagenes en virtuemar_product_media
 		$Productos = array();
-		// Consulta para obtener ID y Referencia Proveedor
-		$campos ="`virtuemart_product_id`,`product_gtin`";
-		$tabla = "_virtuemart_products";
-		$whereC = " ";
-		$Consulta = "SELECT ".$campos." FROM `".$prefijoTabla."_virtuemart_products` ".$whereC;
-		$Query = $BDVirtuemart->query($Consulta);
+		$campo[1] ="P.virtuemart_product_id";
+		$campo[2] ="P.product_gtin";
+		$campo[3] ="M.virtuemart_media_id";
+		$tabla[1] = $prefijoTabla."_virtuemart_products P";
+		$tabla[2] = $prefijoTabla."_virtuemart_product_medias M";
+		$ConsultaRelacionada = 'SELECT '.$campo[1].','.$campo[2].','.$campo[3].' FROM '.$tabla[1].' left join '.$tabla[2].' On '.$campo[1].'=M.virtuemart_product_id ORDER BY '.$campo[1].' ASC ';
+		$Query = $BDVirtuemart->query($ConsultaRelacionada);
 		$i = 0;
+		//~ $Productos['ErrorConsulta'] = $ConsultaRelacionada;
 		if ($Query->num_rows > 0){
-			$Productos['TotalProductos'] = $Query->num_rows;	
+			$y = 0;
+			$productoR = '';
 			while ($fila = $Query->fetch_assoc()) {
-				$i++;
-				$Productos[$i]['product_id'] = $fila['virtuemart_product_id'];
-				$Productos[$i]['product_gtin'] = $fila['product_gtin'];
+				// Hay que tener en cuenta que devuelve filas de dos tablas, de products y product_media
+				//, donde si un product tiene dos imagenes entonces devuelve dos filas,
+				//  con el mismo id de producto y con distinto media_id
+				// Listado va por orden de Idproducto
+				// Ejemplo montamos.:
+				/*[2886] => Array
+					(
+					[product_id] => 2914
+					[product_gtin] =>  M110831
+					[Imagenes] => Array
+							(
+							[0] => Array
+							(
+								[virtuemart_media_id] => 2257
+							)
+
+							[1] => Array
+							(
+								[virtuemart_media_id] => 5617
+							)
+		            )
+				*/
+				
+				
+				if ($productoR != $fila['virtuemart_product_id']){
+					$i++;
+					$Productos[$i]['product_id'] = $fila['virtuemart_product_id'];
+					$Productos[$i]['product_gtin'] = $fila['product_gtin'];
+				}
+				if (isset($fila['virtuemart_media_id'])){
+					$Productos[$i]['Imagenes'][]['virtuemart_media_id'] = $fila['virtuemart_media_id'];
+				} else {
+					$y = $y +1; // Contador Productos que no tiene imagen asignada.
+				}
+				$productoR = $fila['virtuemart_product_id'];
+
 			}
-		
-		
 		} else { 
-			$Productos['ErrorConsulta'] = $Consulta;
+			$Productos['ErrorConsulta'] = $ConsultaRelacionada;
 		}
+		$Productos['TotalProductos'] = $i;	
+		$Productos['SinIdMedia'] = $y;
 		return $Productos;
 	}
 	
@@ -79,28 +80,6 @@
 	
 	
 	function ProductosImagenMal($Productos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor) {
-		
-		if ($Productos['TotalProductos']){
-			// Quiere decir que envio productos.
-			$i = 0;
-			// Montamos array con id media....todos los productos.
-			$campos = "`virtuemart_product_id`, `virtuemart_media_id`";
-			$tabla = "_virtuemart_product_medias";
-			for ( $i=1 ; $i <= $Productos['TotalProductos']; $i++) {
-				// Ahora buscamos tabla product_medias el id de media.
-				$whereC = " WHERE virtuemart_product_id=".$Productos[$i]['product_id'];
-				$Consulta2 = $BDVirtuemart->query("SELECT ".$campos." FROM ".$prefijoTabla.$tabla.$whereC);
-				if ($Consulta2->num_rows >0){
-					// Quiere decir que encontro ID de media
-					while ($fila2 = $Consulta2->fetch_assoc()) {
-					   $Productos[$i]['media_id'] = $fila2['virtuemart_media_id'];	
-					} 
-				} else {
-					// Quiere decir que no HAY ID de media
-						$Productos[$i]['media_id'] = 0;	
-				}
-			}
-		}
 		// Ahora contamos productos que no tiene asignado imagen
 		$i= 0 ;
 		$conImagenes = 0;
@@ -133,9 +112,7 @@
 					$Productos[$i]['NImagenes'] = 0;
 				}
 			}
-			
 		}
-		
 		
 		$Productos['ConIDMedia'] = $conImagenes;
 		$Productos['SinIDMedia'] = $Productos['TotalProductos']-$Productos['ConIDMedia'];
@@ -176,16 +153,24 @@
 		return $respuesta;
 	}
 	
-	function ObtenerDatosficheros($files,$BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla) 
+	function ObtenerDatosMedia($files,$BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla) 
 	{
-		// Que imagenes hay virtuemart_media_id y no se utilizan en virtuemart_product_medias, pero que 
-		// esa imagen este en directorio imagenes de productos.
+		// Objetivo:
+		//  1.- Cuanto registros hay virtuemart_media typo product.
+		//  2.- Cuales de estos la URL indicada no se encuentra.
+		//  3.- Y cuales existen.
 		$IdArray = array();
-		$ArrayIDMedia = array();
-		//~ $Consulta = 'SELECT `virtuemart_media_id`,`file_url` FROM `xcv7n_virtuemart_medias` WHERE `file_type`="product" ORDER BY `virtuemart_media_id` ASC';
-		$ConsultaRelacionada = 'SELECT M.virtuemart_media_id,M.file_url,P.virtuemart_product_id FROM '.$prefijoTabla.'_virtuemart_product_medias P inner join '.$prefijoTabla.'_virtuemart_medias M On M.virtuemart_media_id=P.virtuemart_media_id WHERE M.file_type="product" ORDER BY M.virtuemart_media_id ASC ';
+		$tabla = array();
+		$tabla[1] = $prefijoTabla.'_virtuemart_product_medias';
+		$tabla[2] = $prefijoTabla.'_virtuemart_medias';
+		//  1.- Cuanto registros hay virtuemart_media typo product.
+		$consulta = "SELECT * FROM ".$tabla[2].' WHERE file_type="product"';
+		$MediaProducts = $BDVirtuemart->query($consulta);
+		$IdArray['NRegProducto']= $MediaProducts->num_rows ; // Cantidad registros que hay media que son productos
+		
+		//  2.- Cuales de estos la URL indicada no se encuentra.
+		$ConsultaRelacionada = 'SELECT M.virtuemart_media_id,M.file_url,if( P.virtuemart_product_id IS NULL , 0, P.virtuemart_product_id ) AS virtuemart_product_id FROM '.$tabla[2].' M LEFT JOIN '.$tabla[1].' P On M.virtuemart_media_id=P.virtuemart_media_id WHERE M.file_type="product" ORDER BY M.virtuemart_media_id ASC ';
 		$MediaProducts = $BDVirtuemart->query($ConsultaRelacionada);
-		//~ $IdArray = $MediaProducts;
 		$i = 0;
 		while ($MediaProduct = $MediaProducts->fetch_assoc()){
 			$IdArray[$i] = $MediaProduct ;
@@ -200,11 +185,11 @@
 		//      [file_url] => images/stories/virtuemart/product/A110205.jpg
 		//      [virtuemart_product_id] => 207
 		//  )
-		// Donde $RutaServidor.$DirInstVirtuemart./file_url es igual  array $files con  [1] => /home/antonio/www/multipiezas/images/stories/virtuemart/product/A110205.jpg
 		
+		//  3.- Y cuales existen de verdad.
 		$i=0;
-		$IdArray['NumeroFiles']= count($files);
 		foreach ($IdArray as $ID){
+			$i++;
 			$encontrado = 'no';
 			$url = $RutaServidor.$DirInstVirtuemart.'/'.$ID['file_url'];
 			$IdArray[$i]['Url'] = $url;
@@ -215,10 +200,12 @@
 				}
 			}
 		$IdArray[$i]['Existe'] = $encontrado;
-		$i++;
+		
 		
 		}	
-			
+		//~ $IdArray['Consulta'] = $ConsultaRelacionada;
+		
+		$IdArray['NumeroFiles']= count($files);// Cantidad de ficheros encontrados.
 		return $IdArray;	
 	}	
 	

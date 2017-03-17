@@ -1,14 +1,8 @@
 <?php
-/* El objetivo es recortar imagenes que no sean cuadradas.
+/* El objetivo es controlar las imagenes que hay productos, los existen /virtuemart/product y los que no se utilizan.
  * Recortando al tamaño más grande posible.
  * Creando una imagen cuadrada en una carpeta que le indiquemos.
  */
- 
- 
-
-//~ echo '<pre>';
-//~ print_r($Imagenes);
-//~ echo '</pre>';
 
 ?>
 
@@ -24,70 +18,66 @@
 
 </head>
 <body>
-<?php 
-	include './../../header.php';
-	 include 'funciones.php';
-
-?>
+	<?php 
+		include './../../header.php';
+		include 'funciones.php';
+	?>
     <script src="<?php echo $HostNombre; ?>/modulos/mod_revisarvirtuemart/funciones.js"></script>
-
-
 <?php
- // Variable de inicio y entorno:
-$sufijo = '_'.$ImgAltoCfg.'x'.$ImgAnchoCfg;
- 
-// Recuerda que header.php incluimos el fichero de configuración 
+	// Inicializamos variable de inicio y entorno:
+	$error ='';
+	$ficheros = array ();
+	//Creamos array de ficheros que existene en el directorio
+	$files = filesProductos($RutaServidor,$DirImageProdVirtue); 
+	// Ahora obtenemos productos.
+	$TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
+	if (isset($TodosProductos['ErrorConsulta'])){
+		// Ahora comprobamos si hubo un error en la consulta,
+		$error = '<p>Error de conexion con la base de datos o no hay articulos pasados</p>';
+		$error .= '<p>'.$TodosProductos['ErrorConsulta'].'</p>';
+	}	
+	// Ahora comprobamos:
+	//		1.- Registros que hay en tabla Media
+	//		2.- Que registros no se utilizan
+	//		3.- Si todos los registros (url) son correcta y existen.
+	$Media = ObtenerDatosMedia( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla );
+	if ($Media['NumeroFiles']!= count($files)){
+		// Quiere decir que el numero ficheros y el numero registros de media_product no son iguales
+		$error .= '<p>Hubo en error en Media ya que obtuvo la misma cantidad ficheros... </p>';
+	}
+	// Obtenemos el valores de [Existe] y de [virtuemart_product_id]
+	$CArrayExiste = array_count_values(array_column($Media, 'Existe'));// Creamos array suma de resultados
+	$ArrayId = array_count_values(array_column($Media, 'virtuemart_product_id'));// Creamos array suma de resultados
+	//~ $ArrayId = array_column($Media,'virtuemart_product_id');
+	//Ahora montamos array (MediaResumen)
+	if (isset($CArrayExiste['no'])){
+		$MediaResumen['NoUrl'] = $CArrayExiste['no'];
+	} else {
+		$MediaResumen['NoUrl'] =0;
+	}
+	if (isset($ArrayId[0])){
+		
+		$MediaResumen['NoUtiliza'] = $ArrayId[0]; // Cantidad de registro que id producto es 0
+	}else{
+		$MediaResumen['NoUtiliza'] = 0;
+	}
+	// Obtenemos array de producto.
+	$productos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
+	// Ahora nos falta solo los datos de:
+	// Ficheros que no son imagenes en el directorio .
+	// Ficheros que no existen en Media
+	// Los registros Media que no encuentra URL
+	// Los registros en Media que no se utilizan en producto.
 	
-// Incluimos fichero funciones
- 
- // Inicializamos varibles
- $ficheros = array ();
- //Creamos array de ficheros que existene en el directorio
- $Tfiles = filesProductos($RutaServidor,$DirImageProdVirtue); 
- $Nfiles = count($Tfiles);
-// Comprobamos si hay muchos ficheros ya que si son mucho.
-// si hay mas 50 ficheros puede tardar en cargar.
-// por ello solo cargamos 50 ficheros, el problema 
-// si queremos ordenados todos por ID media,
-// de momento ordeno solo los 50 que presentamos. 
-if ($Nfiles > 500) {
- //~ // Lo que hago es solo reco
-	$files = array_slice($Tfiles, 0, 500);
- //~ 
-} else {
-	$files = $Tfiles;
-}
-$ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
- 	 // Ahora ponemos valor variable ficheroerror
-	 if ($ficheros['NFicherosNoEncontrados']) {
-			$ficheroerror = $ficheros['NFicherosNoEncontrados'];
-		} else {
-			$ficheroerror = 0;
-		} 
-// Ahora obtenemos productos.
- $TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
- // Ahora compramos cuantos productos obtenemos y si hubo un error.
- 
- if (isset($TodosProductos['ErrorConsulta'])){
-	echo '<div class= "container"><h4>Hubo un error de conexion con la base de datos o no hay articulos pasados</h4>';
-	echo '<p>'.$TodosProductos['ErrorConsulta'].'</p></div>';
-	exit;
-}	
-
-$IDficheros = ObtenerDatosficheros( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla );
-// Obtenemos el valores de [Existe] y de [virtuemart_product_id]
-$CArrayExiste = array_count_values(array_column($IDficheros, 'Existe'));// Creamos array suma de resultados
-$ArrayId = array_count_values(array_column($IDficheros, 'virtuemart_product_id'));
-
-
- //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
- echo '<pre>';
-   print_r($CArrayExiste['no']);
-   //~ print_r(array_count_values($ArrayExiste));
-   print_r($IDficheros);
- echo '</pre>';
- 
-?>
+	 
+	
+	// Si hubo error antes mostrar container , se bloquea ...
+	if ($error != ''){
+	 echo '<div class= "container"><h4>Hubo un error</h4>'.$error.'</div>';
+	 exit;	
+	} 
+	
+	?>
 
 	<div class="container">
 		<div class="col-md-8">
@@ -95,113 +85,76 @@ $ArrayId = array_count_values(array_column($IDficheros, 'virtuemart_product_id')
 			<p>El objetivo es saber: </p>
 			<ul> 
 			<li> <strong>Ficheros existentes:</strong> Cuantos ficheros existen en el directorio asignado a productos.</li>
-			<li> <strong>Ficheros No imagenes:</strong> Cuantos de esos ficheros no son imagenes o formato incorrecto. </li>
-			<li> <strong>Ficheros No existen Media</strong>Saber cuantas ficheros no se encuentran tabla virtuemart_media.</li>
-			<li> <strong>Registros Media:</strong> Cuantos registros hay en virtuemart_media que tipo producto.</li>
-			<li> <strong>Registros no utiliza:</strong> Saber cuantos registros de virtuemart_media de tipo product no se utilizan.</li>
+			<li> <strong>Ficheros No imagenes:</strong> Cuantos de esos ficheros no son imagenes o su extension no es correcto. </li>
+			<li> <strong>Ficheros No existen Media:</strong> Cuantos ficheros existen directorio y no en tabla de Media</li>
+			<li> <strong>Media Registros:</strong> Cuantos registros hay en virtuemart_media (solo tipo producto).</li>
+			<li> <strong>Media url No encuentra:</strong> Comprobamos cuantas urls de media no son correctas.</li>
+			<li> <strong>Media Reg.No utiliza:</strong> Cuantos registros de virtuemart_media de tipo product no se utilizan.</li>
+			<li> <strong>Productos Total:</strong>Cantidad de Productos que hay.</li>
 			<li> <strong>Productos sin imagen:</strong>Que productos no tiene imagen asignada.</li>
-			<li> <strong>Productos tiene Imagen Mal:</strong>Cuantos productos tiene una imagen MAL asignada, no existe.</li>
+			<li> <strong>Productos Imagen Mal:</strong>Cuantos productos tiene una imagen MAL asignada, no existe.</li>
 			</ul> 
-			<h4>Comprobaciones</h4>
-			<div>
-			<div style="float:left;margin-left:20px;">Ficheros existentes <span class="label label-default"><?php echo $Nfiles;?></span></div>
-			<div style="float:left;margin-left:20px;">Ficheros no encontrados <span class="label label-default"><?php echo $ficheroerror;?></span></div>
-			<div style="float:left;margin-left:20px;">Imagenes no utilizas <span class="label label-default"><?php echo	$ArrayId[0];?></span></div>
-			</div>
-			<div>
-			<div style="float:left;margin-left:20px;">Productos sin imagen <a id="LinkPSImagen" style="display:none" href="./vistaSinImagen.php"><span id="PSImagen" class="label label-default"> <?php echo	$ArrayId[0];?> </span></a></div>
-			<div style="float:left;margin-left:20px;">Productos con imagen MAL <span id="PMImagen" class="label label-default">? </span></div>
 			
-			</div>
 		</div>
 		<div class="col-md-4">
 			<h3>Pasos que realizamos</h3>
-			<ul>
-			<li>Creamos array de ficheros que hay en directorio virtuemart/product</li>
-			<li>Buscamos el campo `virtuemart_media_id` en la tabla `$prefijoTabla_virtuemart_medias` que contenga direccion del fichero en el campo 'file_url'.</li>
-			<li>Buscamos el id 'vituemart_media_id' en la tabla `$prefijoTabla_virtuemart_product_medias`  para saber si se usa en algún producto, si no se usa entonces </li>
-				<ul>
-				<li> Comprobamos si existe miniatura.</li>
-				<li> ELiminamos imagen y miniatura si existe ( de momento solo mostramos en pantalla)</li>
-				</ul>
-			</ul>		
+			<ol>
+				<li>Array ficheros en directorio virtuemart/product</li>
+				<li>Buscamos el campo `virtuemart_media_id` en la tabla `$prefijoTabla_virtuemart_medias` que contenga direccion del fichero en el campo 'file_url'.</li>
+				<li>Buscamos el id 'vituemart_media_id' en la tabla `$prefijoTabla_virtuemart_product_medias`  para saber si se usa en algún producto, si no se usa entonces </li>	
+			</ol>		
 			<div id="proceso">
 			</div>
-			
-			
-			
 		</div>
 		<div class="col-md-12">
-			<h2>Imagenes que no se utiliza</h2>
-			<p> Listado de imagenes que no se encuentrar en tabla product_media.</p>
-			<table class="table">
-				<thead>
-					<tr>
-						<th>IDImagen</th>
-						<th>Nombre fichero</th>
-						<th>IDMedia</th>
-					</tr>
-				
-				</thead>
-				<?php
-				//Con el siguiente bucle ordeno por id
-				foreach ( $ficheros as $clave => $fichero ) {
-					$Ruta[$clave] = $fichero['Ruta'];
-					$ID[$clave] = $fichero['IDmedia'];
-
-				}
-				// Ordenamos por ID ascendente.
-				array_multisort($ID, SORT_ASC, $ficheros);
-				
-				
-				
-				
-				$x=0;
-				
-				foreach ($ficheros as $fichero)
-				{
-					if (isset($fichero['aviso'])){
-						$x= $x+1;
-						echo '<tr>';
-						echo '<td>'.$x.'</td><td>'.basename($fichero['Ruta']).'</td><td>'.$fichero['IDmedia'].'</td>';
-						echo '</tr>';
-					}
-				}
-				?>
-			</table>
+		<h4>Resultado</h4>
+			<div>
+				<div class="floatL marginL20">
+					Ficheros existentes 
+					<span class="label label-default"><?php echo $Media['NumeroFiles'];?></span>
+				</div>
+				<div class="floatL marginL20">
+					Ficheros NO imagenes 
+					<span class="label label-default">?</span>
+				</div>
+				<div class="floatL marginL20">
+					Ficheros No Media 
+					<span class="label label-default">?</span>
+				</div>
 			</div>
-			<div class="col-md-12">
-			<h2>Listado de ficheros no encontrados en tablas virtuemart_media</h2>
-			<p> Estos ficheros no son los que vamos eliminar del servidor, ya que no existen la tabla de virtuemart_media, por lo entiendo que ya no existe la miniatura y que no se utiliza en la tabla productos.</p>
-			<div class="alert alert-warning">
-			<strong>Atención</strong>
-			<p> Un motivo por el que aparezca aqui el fichero, puede ser que el nombre tenga algún caracter extraño y por eso no lo encontro en busqueda en tabla virtuemart_media.</p>
-			<p class="text-center"><strong>Así que procede con prudencia a la hora borrar ficheros de este listado.</strong></p>
+			<div>
+				<div class="floatL marginL20">
+					Media Total Reg
+						<span class="label label-default"><?php echo $Media['NRegProducto'];?></span>
+				</div>
+				<div class="floatL marginL20">
+					Media url No encuentra 
+					<span class="label label-default"><?php echo $MediaResumen['NoUrl'];?></span>
+				</div>
+				<div class="floatL marginL20">
+					Media Reg.No utiliza 
+					<span class="label label-default"><?php echo $MediaResumen['NoUtiliza'];?></span>
+				</div>
 			</div>
-			<?php
-			$x= 0;
-			foreach ($ficheros as $fichero)
-			{
-				if (isset($fichero['error'])){
-					$x= $x+1;
-					//~ setlocale(LC_CTYPE, 'POSIX');
-					//~ setlocale(LC_ALL, 'es_ES');
-					//~ $textoFichero = iconv('UTF-8', 'ASCII//TRANSLIT', $fichero['Ruta']);
-					//~ $textoFichero = iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $fichero['Ruta']);
-					$textoFichero =$fichero['Ruta'];
-					//~ $textoFichero = iconv( 'utf-8','ISO-8859-1', $textoFichero);
-					//~ foreach(mb_list_encodings() as $chr){
-						//~ echo  $x.'- '.mb_convert_encoding($textoFichero, 'UTF-8', $chr)." : ".$chr."<br>";   
-					//~ } 
-					echo $x.'- '.basename($textoFichero).'<br/>';
-				}
-			}
-			?>
-			
-			
+			<div>
+				<div class="floatL marginL20">
+					Productos Total 
+					<span class="label label-default"><?php echo $productos['TotalProductos'];?> </span>
+				</div>
+				<div class="floatL marginL20">
+					<a href="./vistaMedioProductos.php">
+					Productos sin imagen 
+						<span class="label label-default"><?php echo $productos['SinIdMedia'];?> </span>
+					</a>
+				</div>
+				<div class="floatL marginL20">
+					Productos Mal imagen 
+					<span id="PMImagen" class="label label-default">? </span>
+				</div>
 			</div>
-	</div>
-	 <script>
+		</div>
+		
+		<script>
          //~ // Se ejecuta cuando termina de carga toda la pagina.
             $(document).ready(function () {
                 comprobarProductos();
