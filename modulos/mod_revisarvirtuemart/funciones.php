@@ -173,18 +173,9 @@
 		$MediaProducts = $BDVirtuemart->query($ConsultaRelacionada);
 		$i = 0;
 		while ($MediaProduct = $MediaProducts->fetch_assoc()){
-<<<<<<< HEAD
-			$url = $RutaServidor.$DirInstVirtuemart.'/'.$MediaProduct['file_url'];
-			if ($file== $url) { 
-			$IdArray[$i]['encontrado'] ='si';
-			break;
-			};
-		$i++;
-=======
 			$IdArray[$i] = $MediaProduct ;
 			$i++;
 			
->>>>>>> b2757bf239071565abb6894324404597f9c8ea99
 		}
 		// Ahora tenemos un $IdArray con los ficheros que existen en productos.
 		// Ejemplo array:
@@ -222,13 +213,18 @@
 	// Url de origen http://www.abantos-autoparts.com/tienda/fotos/
 	function recibe_imagen($nombrefichero,$HostNombre){
 		$nombrefichero = trim($nombrefichero);
-		$url_origen = "http://www.abantos-autoparts.com/tienda/fotos/".$nombrefichero;
+		$url_origen = "http://www.abantos-autoparts.com/tienda/fotos/".$nombrefichero.'.jPG';
+		//~ $url ="http://multifrenos.es/images/headers/logoMultifrenos.png";
+		$proceso =  exif_imagetype($url_origen);
+		//~ if (file_exists($url_origen)){
 		$archivo_destino= $_SERVER['DOCUMENT_ROOT'].$HostNombre.'/BancoFotos/'.$nombrefichero.'.jpg';
 		$imagen = file_get_contents($url_origen);
 		$fs_archivo = file_put_contents($archivo_destino,$imagen);
-		
-		
-		return $archivo_destino;
+		//~ $proceso ='correcto';
+		//~ } else {
+		//~ $proceso ='error';
+		//~ }
+		return $proceso;
 	} 
 
 	// Funcion para comprobar estado ( Si existe el fichero en el servidor )

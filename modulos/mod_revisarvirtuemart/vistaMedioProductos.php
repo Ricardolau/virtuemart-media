@@ -13,12 +13,6 @@ var nombreFichero;
 function metodoClick(pulsado){
 	console.log("Inicimos switch de control pulsar");
 	switch(pulsado) {
-		case 'Copiar':
-			// Quiere decir que pulso check de toda la seleccion.
-			VerFicheroSeleccionado ();
-			copiar();
-			break;
-			
 		case 'ComprobarLocal':
 			// Quiere decir que pulso check de toda la seleccion.
 			alert('Pulso ComprobarLocal');
@@ -62,14 +56,6 @@ function MarcarTodas() {
 	return;
 	
 }
-// Copia ficheros de abastros
-function copiar() {
-	var NficherosSel = nombreFichero.length;
-	alert('Pulso copiar '+NficherosSel);
-	console.log('Cantidad de Ficheros seleccionadas:'+NficherosSel);
-	console.log('Ficheros seleccionadas:'+nombreFichero);
-	copiarFicheros();
-}
 
 // Funcion para leer los check que se seleccionaron
 function VerFicheroSeleccionado (){
@@ -107,29 +93,6 @@ function VerFicheroSeleccionado (){
 		
 }
 
-function copiarFicheros() {
-	// Script que utilizamos para ejecutar AJAX.
-	var parametros = {
-	 "pulsado" 	: 'CopiarFichero',
-	 "fichero"	: nombreFichero[0]
-			};
-	$.ajax({
-		data:  parametros,
-		url:   'tareas.php',
-		type:  'post',
-		beforeSend: function () {
-				console.log('Enviamos');
-				console.log(nombreFichero[0]);
-
-		},
-		success:  function (response) {
-				// Cuando se recibe un array con JSON tenemos que parseJSON
-				//~ var resultado =  $.parseJSON(response)
-				console.log('Respuesta');
-				console.log(response);
-		}
-	});
-}
 
 // Funcion para comprobar si existe la imagen en la instalación de la web
 function comprobarEstado(){
@@ -156,10 +119,31 @@ function comprobarEstado(){
 			},
 			success:  function (response) {
 					// Cuando se recibe un array con JSON tenemos que parseJSON
+					//~ var respuesta = response;
 					console.log('Recibimos respuesta');
 					$("#proceso").html("Termino");
 					console.log('Respuesta');
 					console.log(response);
+					//~ console.log(respuesta.length);
+					//~ console.log(response.toSource());
+					for (var id in response){
+						console.log(response[id]);
+						if (response[id] === ' Existe'){
+							console.log( 'Disabled check'+ id);
+							$("#Proceso"+id).html("Existe ");
+							$('input[name=checkFic'+id+']').prop("checked", false);// De marco
+							$('input[name=checkFic'+id+']').attr("disabled", true); // Desactivo
+						} else {
+							console.log(' Ponemos no existe en proceso' +id);
+							$("#Proceso"+id).html("No existe servidor");
+
+						
+						}
+					}
+					// Ahora desmarcamos todas..
+					$('input[name=checkTotal]').prop("checked", false);
+					MarcarTodas();
+
 			}
 		});
 	}
@@ -177,12 +161,6 @@ function comprobarEstado(){
 ?>
 <script src="<?php echo $HostNombre; ?>/modulos/mod_revisarvirtuemart/funciones.js"></script>
 <?php
- // Obtenemos de lo queremos mostrar.
-	if ($_GET) {
-		if ($_GET['view']) {
-			$view = $_GET['view'];
-		}
-	}	
 	$TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
  // Creamos array con producto que no tiene imagen
 	$productosSinImagen = array();
@@ -206,7 +184,6 @@ function comprobarEstado(){
 	<div class="col-md-8">
 		<?php echo 'Nos faltan imagenes en productos:'.$TodosProductos ['SinIdMedia'];	?>
 		<input type="submit" value="Comprobar Local" onclick="metodoClick('ComprobarLocal');"> 
-		<input type="submit" value="Copia Imagenes Abastros" onclick="metodoClick('Copiar');"> 
 
 	</div>
 	<div class="proceso" id="proceso">
@@ -236,12 +213,12 @@ function comprobarEstado(){
 				<td><?php echo $Productos['product_id'];?></td>
 				<td><span id="nombreFichero<?php echo $i;?>"><?php echo $Productos['product_gtin'];?></span></td>
 				<td class="rowCompLocal"><span id="CompLocal<?php echo $i;?>"></span></td>
-				<td class="rowCompAbastro"><span id="CompLocal<?php echo $i;?>"></span></td>
+				<td class="rowCompAbastro"><?php echo '<a href="http://www.abantos-autoparts.com/tienda/fotos/"'.$Productos['product_gtin'].'jPG">Link abastros</a>';?>"></span></td>
 				<td class="ProcesoEstado"><span id="Proceso<?php echo $i;?>"></span></td>
 
 			</tr>	
 		<?php
-			if ($i >50){
+			if ($i >250){
 				//Salimo de bucle
 				break;
 			}

@@ -69,52 +69,6 @@
 	// Los registros Media que no encuentra URL
 	// Los registros en Media que no se utilizan en producto.
 	
-<<<<<<< HEAD
-// Incluimos fichero funciones
- 
- // Inicializamos varibles
- $ficheros = array ();
- //Creamos array de ficheros que existene en el directorio
- $Tfiles = filesProductos($RutaServidor,$DirImageProdVirtue); 
- $Nfiles = count($Tfiles);
-// Comprobamos si hay muchos ficheros ya que si son mucho.
-// si hay mas 50 ficheros puede tardar en cargar.
-// por ello solo cargamos 50 ficheros, el problema 
-// si queremos ordenados todos por ID media,
-// de momento ordeno solo los 50 que presentamos. 
-if ($Nfiles > 500) {
- //~ // Lo que hago es solo reco
- $files = array_slice($Tfiles, 0, 500);
- //~ 
-} 
-$ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
- 	 // Ahora ponemos valor variable ficheroerror
-	 if ($ficheros['NFicherosNoEncontrados']) {
-			$ficheroerror = $ficheros['NFicherosNoEncontrados'];
-		} else {
-			$ficheroerror = 0;
-		} 
-// Ahora obtenemos productos.
- $TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
- // Ahora compramos cuantos productos obtenemos y si hubo un error.
- 
- if (isset($TodosProductos['ErrorConsulta'])){
-	echo '<div class= "container"><h4>Hubo un error de conexion con la base de datos o no hay articulos pasados</h4>';
-	echo '<p>'.$TodosProductos['ErrorConsulta'].'</p></div>';
-	exit;
-}	
-
- $IDficheros = ObtenerDatosficheros( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart );
-
-
- //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
- //~ echo '<pre>';
- //~ print_r($RutaServidor.$DirInstVirtuemart);
- //~ echo '</pre>';
- 
-?>
-=======
-	 
 	
 	// Si hubo error antes mostrar container , se bloquea ...
 	if ($error != ''){
@@ -123,7 +77,6 @@ $ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
 	} 
 	
 	?>
->>>>>>> b2757bf239071565abb6894324404597f9c8ea99
 
 	<div class="container">
 		<div class="col-md-8">
