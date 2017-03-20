@@ -6,13 +6,22 @@
 	include './../../modulos/mod_conexion/conexionBaseDatos.php';
 ?>
 <script>
+// Variable Globales
+var checkID;
+var nombreFichero;
 // Funcion para controlar lo pulsado (botones y link )
 function metodoClick(pulsado){
 	console.log("Inicimos switch de control pulsar");
 	switch(pulsado) {
 		case 'Copiar':
 			// Quiere decir que pulso check de toda la seleccion.
-			alert('Pulso copiar');
+			VerFicheroSeleccionado ();
+			copiar();
+			break;
+			
+		case 'ComprobarLocal':
+			// Quiere decir que pulso check de toda la seleccion.
+			alert('Pulso ComprobarLocal');
 			break;
 			
 		case 'TodaSeleccion':
@@ -47,6 +56,75 @@ function MarcarTodas() {
 	
 	
 }
+// Copia ficheros de abastros
+function copiar() {
+	var NficherosSel = nombreFichero.length;
+	alert('Pulso copiar '+NficherosSel);
+	console.log('Cantidad de Ficheros seleccionadas:'+NficherosSel);
+	console.log('Ficheros seleccionadas:'+nombreFichero);
+	copiarFicheros();
+}
+
+// Funcion para leer los check que se seleccionaron
+function VerFicheroSeleccionado (){
+		$(document).ready(function()
+		{
+			// Contamos check están activos.... 
+			// Reiniciamos varibles globales.
+			checkID = [] ;
+			nombreFichero = [];
+			// variable funcion para bucle.			
+			var i= 0;
+			// Con la funcion each hace bucle todos los que encuentra..
+			$(".rowCheckFichero").each(function(){ 
+				i++;
+				//todos los que sean de la clase row1
+				if($('input[name=checkFic'+i+']').is(':checked')){
+					// Solo entramos en los que están seleccionado.
+					// Ahora tengo hacer array :
+					valor = '0';
+					valor = $('input[name=checkFic'+i+']').val();
+					checkID.push( valor );
+					
+					valor = '0';
+					nombreCampo = 'nombreFichero'+i;
+					valor = document.getElementById(nombreCampo).innerHTML;
+					nombreFichero.push( valor+'.jPG');
+					
+					
+				}
+				
+			});
+			console.log('ID de Ficheros seleccionadas:'+checkID);
+			
+			
+			return;
+		});
+}
+
+function copiarFicheros() {
+	// Script que utilizamos para ejecutar AJAX.
+	var parametros = {
+	 "pulsado" 	: 'CopiarFichero',
+	 "fichero"	: nombreFichero[0]
+			};
+	$.ajax({
+		data:  parametros,
+		url:   'tareas.php',
+		type:  'post',
+		beforeSend: function () {
+				console.log('Enviamos');
+				console.log(nombreFichero[0]);
+
+		},
+		success:  function (response) {
+				// Cuando se recibe un array con JSON tenemos que parseJSON
+				//~ var resultado =  $.parseJSON(response)
+				console.log('Respuesta');
+				console.log(response);
+		}
+	});
+}
 
 
 
@@ -73,7 +151,7 @@ function MarcarTodas() {
 	$productosSinImagen = array();
 	$i= 0;
 	foreach ($TodosProductos as $productos){
-		if (count($productos['Imagenes'])== 0 && strlen($productos['product_gtin'])>0){
+		if (isset($productos['Imagenes']) != true && strlen($productos['product_gtin'])>0){
 			$i++;
 			$productosSinImagen[$i]['product_gtin']=$productos['product_gtin'];
 			$productosSinImagen[$i]['product_id']=$productos['product_id'];
@@ -116,7 +194,7 @@ function MarcarTodas() {
 			<tr>
 				<td class="rowCheckFichero"><input type="checkbox" name="checkFic<?php echo $i;?>" value="<?php echo $i;?>"></td>
 				<td><?php echo $Productos['product_id'];?></td>
-				<td><?php echo $Productos['product_gtin'];?></td>
+				<td><span id="nombreFichero<?php echo $i;?>"><?php echo $Productos['product_gtin'];?></span></td>
 				<td class="rowCheckLocal"><input type="checkbox" name="checkLocal<?php echo $i;?>" value="<?php echo $i;?>"></td>
 				<td class="rowCheckAbastro"><input type="checkbox" name="checkAbastros<?php echo $i;?>" value="<?php echo $i;?>"></td>
 				<td class="Estado"></td>

@@ -21,8 +21,17 @@ include_once ("./funciones.php");
 $pulsado = $_POST['pulsado'];
  
  switch ($pulsado) {
-   
-    case 'comprobarProductos':
+	case 'CopiarFichero':
+	$nombrefichero = $_POST['fichero'];
+	$CopiarFicheros = recibe_imagen($nombrefichero,$HostNombre);
+	header("Content-Type: application/json;charset=utf-8");
+	echo json_encode( $CopiarFicheros);
+       
+	break;
+	
+	
+	
+	case 'comprobarProductos':
         $TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
         //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
         header("Content-Type: application/json;charset=utf-8");

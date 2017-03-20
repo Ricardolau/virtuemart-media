@@ -209,7 +209,20 @@
 		return $IdArray;	
 	}	
 	
-	
+	// Funcion para copiar imagen
+	// Url de origen http://www.abantos-autoparts.com/tienda/fotos/
+	function recibe_imagen($nombrefichero,$HostNombre){
+		$nombrefichero = trim($nombrefichero);
+		$url_origen = "http://www.abantos-autoparts.com/tienda/fotos/".$nombrefichero;
+		$archivo_destino= $_SERVER['DOCUMENT_ROOT'].$HostNombre.'/BancoFotos/'.$nombrefichero;
+		$imagen = file_get_contents($url_origen);
+		$fs_archivo = file_put_contents($archivo_destino,$imagen);
+		
+		
+		return $archivo_destino;
+	} 
+
+
 ?>
 
 
