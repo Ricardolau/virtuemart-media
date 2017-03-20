@@ -11,3 +11,9 @@ label {
     display: block;
     margin-bottom: 5px;
 }
+.floatL {
+	float: left;
+}
+.marginL20{
+  margin-left: 20px;
+}

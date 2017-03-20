@@ -125,8 +125,6 @@ function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 						break;
 					case 2 :
 						$imagen1= $imagen['rutafichero'];
-						//~ $imagen1= $RutaImagen ;
-						
 						$copiaOrigen = imagecreatefromjpeg($imagen1);
 						break;
 					case 3 :
@@ -135,7 +133,7 @@ function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 			}
 			
 				// Ponemos fondo blanco
-				$white = imagecolorallocatealpha($thumbail, 255, 255, 255,127);
+				$white = imagecolorallocate($thumbail, 255, 255, 255);
 				imagefill($thumbail, 0, 0, $white);
 				imagecopy($thumbail , $copiaOrigen, 0,0,$CorteX,$CorteY,$NuevaMedida,$NuevaMedida);
 			//~ } else {
@@ -145,7 +143,7 @@ function RecortarImagenC ($imagen,$destino,$sufijo, $ImgAltoCfg, $ImgAnchoCfg)
 				//~ 
 			//~ }
 			// Ahora escalamos la imagen a la medida de configuracion
-			$thumbail = imagescale($thumbail, $ImgAltoCfg, $ImgAnchoCfg,  IMG_BICUBIC);
+			$thumbail = imagescale($thumbail, $ImgAnchoCfg, $ImgAltoCfg,  IMG_BICUBIC);
 			// Ahora creamos la nueva ruta destino
 			$RutaImagenNueva = $destino.$imagen['nombre'].$sufijo.'.'.$imagen['extension'];
 			//~ echo 'RutaImagenNueva : '.$RutaImagenNueva.'<br/>';
