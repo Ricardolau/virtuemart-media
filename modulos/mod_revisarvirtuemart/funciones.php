@@ -205,10 +205,10 @@
 	$i=0;
 	foreach ($files as $file ){
 		while ($MediaProduct = $MediaProducts->fetch_assoc()){
-			$url = $RutaServidor.$DirInstVirtuemart.'/'.$MediaProduct['file_url']
+			$url = $RutaServidor.$DirInstVirtuemart.'/'.$MediaProduct['file_url'];
 			if ($file== $url) { 
-			$IdArray[$i]['encontrado'] ='si'
-			break
+			$IdArray[$i]['encontrado'] ='si';
+			break;
 			};
 		$i++;
 		}

@@ -76,9 +76,9 @@ $ficheros = Datosficheros( $files, $BDVirtuemart,$prefijoTabla );
 
 
  //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
- echo '<pre>';
-   print_r($RutaServidor.$DirInstVirtuemart);
- echo '</pre>';
+ //~ echo '<pre>';
+ //~ print_r($RutaServidor.$DirInstVirtuemart);
+ //~ echo '</pre>';
  
 ?>
 
