@@ -214,7 +214,7 @@
 	function recibe_imagen($nombrefichero,$HostNombre){
 		$nombrefichero = trim($nombrefichero);
 		$url_origen = "http://www.abantos-autoparts.com/tienda/fotos/".$nombrefichero;
-		$archivo_destino= $_SERVER['DOCUMENT_ROOT'].$HostNombre.'/BancoFotos/'.$nombrefichero;
+		$archivo_destino= $_SERVER['DOCUMENT_ROOT'].$HostNombre.'/BancoFotos/'.$nombrefichero.'.jpg';
 		$imagen = file_get_contents($url_origen);
 		$fs_archivo = file_put_contents($archivo_destino,$imagen);
 		
@@ -222,8 +222,37 @@
 		return $archivo_destino;
 	} 
 
+	// Funcion para comprobar estado ( Si existe el fichero en el servidor )
+	function comprobarEstado($ficheros,$HostNombre,$DirImageProdVirtue){
+		$resultado = array();
+		$ArrayFicheros = array();
+		$Nficheros = count($ficheros);
+		$i = 1;
+		foreach ($ficheros as $fichero){
+			// Ahora si existe fichero en imagenes/product
+			$fichero_url = $_SERVER['DOCUMENT_ROOT'].$DirImageProdVirtue.$fichero.'.jpg';
+			if (file_exists($fichero_url)){
+				$resultado[$i] = ' Existe';
+				$ArrayFicheros[$i]= $fichero_url;
+			} else {
+				$resultado[$i] = 'No Existe';
+				$ArrayFicheros[$i]= $fichero_url;
+
+			} 
+			
+		$i++;
+		}
+		
+		return $resultado;
+		
+		
+	}
+
+
+
 
 ?>
+
 
 
 

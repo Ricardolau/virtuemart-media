@@ -28,6 +28,12 @@ function metodoClick(pulsado){
 			// Quiere decir que pulso check de toda la seleccion.
 			MarcarTodas();
 			break;
+			
+		case 'ComprobarEstado':
+			// Quiere decir que pulso comprobar.
+			VerFicheroSeleccionado ();
+			comprobarEstado()
+			break;
 		default:
 			alert('Error pulsado incorrecto');
 	}
@@ -53,7 +59,7 @@ function MarcarTodas() {
 		console.log('Entro en cambio '+'checkFic'+i);
 	});
 	
-	
+	return;
 	
 }
 // Copia ficheros de abastros
@@ -67,8 +73,7 @@ function copiar() {
 
 // Funcion para leer los check que se seleccionaron
 function VerFicheroSeleccionado (){
-		$(document).ready(function()
-		{
+		
 			// Contamos check están activos.... 
 			// Reiniciamos varibles globales.
 			checkID = [] ;
@@ -89,17 +94,17 @@ function VerFicheroSeleccionado (){
 					valor = '0';
 					nombreCampo = 'nombreFichero'+i;
 					valor = document.getElementById(nombreCampo).innerHTML;
-					nombreFichero.push( valor+'.jPG');
+					nombreFichero.push(valor);
 					
 					
 				}
 				
 			});
-			console.log('ID de Ficheros seleccionadas:'+checkID);
-			
-			
+			//~ console.log('ID de Ficheros seleccionadas:'+checkID);
+			//~ console.log('Nombre de Ficheros seleccionadas:');
+			//~ console.log(nombreFichero);
 			return;
-		});
+		
 }
 
 function copiarFicheros() {
@@ -126,9 +131,41 @@ function copiarFicheros() {
 	});
 }
 
+// Funcion para comprobar si existe la imagen en la instalación de la web
+function comprobarEstado(){
+	// Comprobamos que si hay alguno seleccionado.
+	alert('Quieres comprobar Estado de todos?');
+	$('input[name=checkTotal]').prop("checked", true);
+	MarcarTodas();
+	VerFicheroSeleccionado();
+	if (nombreFichero){
+		// Obtenemos nombreFichero con check
+		// Script que utilizamos para ejecutar AJAX.
+		var parametros = {
+		 "pulsado" 	: 'comprobarEstado',
+		 "ficheros": nombreFichero
+				};
+		$.ajax({
+			data:  parametros,
+			url:   'tareas.php',
+			type:  'post',
+			beforeSend: function () {
+					console.log('Enviamos '+ nombreFichero[0]);
+					$("#proceso").html("Enviamos "+ nombreFichero[0]);
 
+			},
+			success:  function (response) {
+					// Cuando se recibe un array con JSON tenemos que parseJSON
+					console.log('Recibimos respuesta');
+					$("#proceso").html("Termino");
+					console.log('Respuesta');
+					console.log(response);
+			}
+		});
+	}
+}
 
-
+ 
 </script>
 
 
@@ -166,11 +203,14 @@ function copiarFicheros() {
 <div class="container">
 	<h1>Mostramos los productos que no tiene imagen</h1>	
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 		<?php echo 'Nos faltan imagenes en productos:'.$TodosProductos ['SinIdMedia'];	?>
 		<input type="submit" value="Comprobar Local" onclick="metodoClick('ComprobarLocal');"> 
 		<input type="submit" value="Copia Imagenes Abastros" onclick="metodoClick('Copiar');"> 
 
+	</div>
+	<div class="proceso" id="proceso">
+	<!-- Mostramos barra y proceso que realizamos -->
 	</div>
 	<table class="table table-striped">
     <thead>
@@ -180,9 +220,9 @@ function copiarFicheros() {
 		</th>
         <th>ID Producto</th>
         <th>Ref_gtin</th>
-        <th>ServidorLocal<a title="Comprobamos servidor local si existe">(!)</a></th>
+        <th>Local<a title="Comprobamos servidor local si existe">(!)</a></th>
         <th>Abastros<a title="Comprobamos servidor abastros si existe">(!)</a></th>
-        <th>Existe/Copiada<a title="Comprobamos Existe o copiada">(!)</a></th>
+        <th>Proceso<a title="No existe, Copiada y Existe">(!)</a></th>
       </tr>
     </thead>
     <tbody>
@@ -195,13 +235,16 @@ function copiarFicheros() {
 				<td class="rowCheckFichero"><input type="checkbox" name="checkFic<?php echo $i;?>" value="<?php echo $i;?>"></td>
 				<td><?php echo $Productos['product_id'];?></td>
 				<td><span id="nombreFichero<?php echo $i;?>"><?php echo $Productos['product_gtin'];?></span></td>
-				<td class="rowCheckLocal"><input type="checkbox" name="checkLocal<?php echo $i;?>" value="<?php echo $i;?>"></td>
-				<td class="rowCheckAbastro"><input type="checkbox" name="checkAbastros<?php echo $i;?>" value="<?php echo $i;?>"></td>
-				<td class="Estado"></td>
+				<td class="rowCompLocal"><span id="CompLocal<?php echo $i;?>"></span></td>
+				<td class="rowCompAbastro"><span id="CompLocal<?php echo $i;?>"></span></td>
+				<td class="ProcesoEstado"><span id="Proceso<?php echo $i;?>"></span></td>
 
 			</tr>	
 		<?php
-	
+			if ($i >50){
+				//Salimo de bucle
+				break;
+			}
 		}
 	?>
       <tr>
@@ -220,6 +263,14 @@ function copiarFicheros() {
 	//~ echo '</pre>';
 	?>
 </div>
-
+<script>
+         //~ // Se ejecuta cuando termina de carga toda la pagina.
+            $(document).ready(function () {
+                VerFicheroSeleccionado ();
+				comprobarEstado()
+                
+                
+            });
+        </script>
 </body>
 </html>
