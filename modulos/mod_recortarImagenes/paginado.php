@@ -1,7 +1,14 @@
 <?php
 // =========       inicio de Paginado     ===================  //
-	
-	if ($CantidadFicheros > 50 ) {
+// Debemos hacer una funcion de paginacion.
+// Voy anotando los datos que deberíamos recibir son:
+// $CantidadFicheros
+// $LimitePagina  // Ya a tengo creada;
+// $LinkBase Donde estamos...Esto no lo mandamos de momento...
+// $OtrosParametros  de momento no lo utilizo
+$OtrosParametros = '';
+$LinkBase = './recortar.php?';
+	if ($CantidadFicheros > $LimitePagina ) {
 	// Si hay mas 50 , realizamos paginación.
 			$TotalPaginas = $CantidadFicheros / $LimitePagina;
 	}
@@ -78,21 +85,21 @@
 
 	// Montamos HTML para mostrar...
 	$htmlPG =  '<ul class="pagination">';
-	$Linkpg = '<li><a href="./recortar.php?pagina=';
+	$Linkpg = '<li><a href="'.$LinkBase.'pagina=';
 	// Pagina inicio 
 	if (count($paginas['previo'])== 0){
 		if ($paginas['Actual'] == $paginas['inicio']){
 			$htmlPG = $htmlPG.'<li class="active"><a>'.$paginas['inicio'].'</a></li>';
 		} else {
-		$htmlPG = $htmlPG.$Linkpg.$paginas['inicio'].'">'.$paginas['inicio'].'</a></li>';
+		$htmlPG = $htmlPG.$Linkpg.$paginas['inicio'].$OtrosParametros.'">'.$paginas['inicio'].'</a></li>';
 		}
 	} else {
 		if ($paginas['inicio']+6 <= $paginas['Actual']) {
-		$htmlPG = $htmlPG.$Linkpg.$paginas['inicio'].'">'."Inicio".'</a></li>';
+		$htmlPG = $htmlPG.$Linkpg.$paginas['inicio'].$OtrosParametros.'">'."Inicio".'</a></li>';
 		$htmlPG = $htmlPG.'<li class="disabled"><a>'.'<<...>>'.'</...></a></li>';
 
 		} else {
-		$htmlPG = $htmlPG.$Linkpg.$paginas['inicio'].'">'.$paginas['inicio'].'</a></li>';
+		$htmlPG = $htmlPG.$Linkpg.$paginas['inicio'].$OtrosParametros.'">'.$paginas['inicio'].'</a></li>';
 		}
 		
 	}
@@ -104,7 +111,7 @@
 	foreach ($paginas['previo'] as $pagina) {
 		// Si hay valor de busqueda tenemos que meterlo en link.
 		
-		$htmlPG = $htmlPG.$Linkpg.$pagina.'">'.$pagina.'</a></li>';
+		$htmlPG = $htmlPG.$Linkpg.$pagina.$OtrosParametros.'">'.$pagina.'</a></li>';
 		
 	
 	}
@@ -120,17 +127,17 @@
 	}
 	// Pagina siguientes.
 	foreach ($paginas['next'] as $paginaF	) {
-		$htmlPG = $htmlPG.$Linkpg.$paginaF.'">'.$paginaF.'</a></li>';
+		$htmlPG = $htmlPG.$Linkpg.$paginaF.$OtrosParametros.'">'.$paginaF.'</a></li>';
 	}
 	//~ $controlError .= '-PaginaF:'.$paginaF;
 	// Mostramos ultima pagina, si no se mostro en previo.
 	if ($paginaF){
 		if ($paginaF + 1 < $paginas['Ultima']){
 			$htmlPG = $htmlPG.'<li class="disabled"><a>'.'<<...>>'.'</...></a></li>';
-			$htmlPG = $htmlPG.$Linkpg.$paginas['Ultima'].'">'.'Ultima</a></li>';
+			$htmlPG = $htmlPG.$Linkpg.$paginas['Ultima'].$OtrosParametros.'">'.'Ultima</a></li>';
 
 		} else{
-		$htmlPG = $htmlPG.$Linkpg.$paginas['Ultima'].'">'.$paginas['Ultima'].'</a></li>';
+		$htmlPG = $htmlPG.$Linkpg.$paginas['Ultima'].$OtrosParametros.'">'.$paginas['Ultima'].'</a></li>';
 		}
 	}
 	$htmlPG = $htmlPG. '</ul>';

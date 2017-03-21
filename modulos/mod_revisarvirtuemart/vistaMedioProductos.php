@@ -165,11 +165,14 @@ function comprobarEstado(){
  // Creamos array con producto que no tiene imagen
 	$productosSinImagen = array();
 	$i= 0;
-	foreach ($TodosProductos as $productos){
-		if (isset($productos['Imagenes']) != true && strlen($productos['product_gtin'])>0){
+	//~ echo '<pre>';
+	//~ print_r($TodosProductos);
+	//~ echo '</pre>';
+	foreach ($TodosProductos as $producto){
+		if (isset($producto['IdMedia']) != true && strlen($producto['product_gtin'])>0){
 			$i++;
-			$productosSinImagen[$i]['product_gtin']=$productos['product_gtin'];
-			$productosSinImagen[$i]['product_id']=$productos['product_id'];
+			$productosSinImagen[$i]['product_gtin']=$producto['product_gtin'];
+			$productosSinImagen[$i]['product_id']=$producto['product_id'];
 		}
 	}
  if (isset($TodosProductos['ErrorConsulta'])){
@@ -182,9 +185,8 @@ function comprobarEstado(){
 	<h1>Mostramos los productos que no tiene imagen</h1>	
 	
 	<div class="col-md-8">
-		<?php echo 'Nos faltan imagenes en productos:'.$TodosProductos ['SinIdMedia'];	?>
-		<input type="submit" value="Comprobar Local" onclick="metodoClick('ComprobarLocal');"> 
-
+		<?php echo 'Nos faltan imagenes en productos:'.count($productosSinImagen);	?>
+		<?php echo 'Todos Productos:'.count($TodosProductos);	?>
 	</div>
 	<div class="proceso" id="proceso">
 	<!-- Mostramos barra y proceso que realizamos -->
@@ -198,7 +200,7 @@ function comprobarEstado(){
         <th>ID Producto</th>
         <th>Ref_gtin</th>
         <th>Local<a title="Comprobamos servidor local si existe">(!)</a></th>
-        <th>Abastros<a title="Comprobamos servidor abastros si existe">(!)</a></th>
+        <th>Google<a title="Realizamos link busqueda en google">(!)</a></th>
         <th>Proceso<a title="No existe, Copiada y Existe">(!)</a></th>
       </tr>
     </thead>
@@ -213,7 +215,7 @@ function comprobarEstado(){
 				<td><?php echo $Productos['product_id'];?></td>
 				<td><span id="nombreFichero<?php echo $i;?>"><?php echo $Productos['product_gtin'];?></span></td>
 				<td class="rowCompLocal"><span id="CompLocal<?php echo $i;?>"></span></td>
-				<td class="rowCompAbastro"><?php echo '<a href="http://www.abantos-autoparts.com/tienda/fotos/"'.$Productos['product_gtin'].'jPG">Link abastros</a>';?>"></span></td>
+				<td class="rowCompAbastro"><?php echo '<a href="https://www.google.es/search?q='.$Productos['product_gtin'].'.jpg" target="_blank">Buscar '.$Productos['product_gtin'].'</a>';?></span></td>
 				<td class="ProcesoEstado"><span id="Proceso<?php echo $i;?>"></span></td>
 
 			</tr>	

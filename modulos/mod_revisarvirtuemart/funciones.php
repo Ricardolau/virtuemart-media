@@ -36,22 +36,16 @@
 				//  con el mismo id de producto y con distinto media_id
 				// Listado va por orden de Idproducto
 				// Ejemplo montamos.:
-				/*[2886] => Array
-					(
-					[product_id] => 2914
-					[product_gtin] =>  M110831
-					[Imagenes] => Array
-							(
-							[0] => Array
-							(
-								[virtuemart_media_id] => 2257
-							)
+				/*Array
+				(
+					[product_id] => 5
+					[product_gtin] => D120004
+					[IdMedia] => Array
+						(
+							[0] => 3978
+						)
 
-							[1] => Array
-							(
-								[virtuemart_media_id] => 5617
-							)
-		            )
+				)
 				*/
 				
 				
@@ -61,7 +55,7 @@
 					$Productos[$i]['product_gtin'] = $fila['product_gtin'];
 				}
 				if (isset($fila['virtuemart_media_id'])){
-					$Productos[$i]['Imagenes'][]['virtuemart_media_id'] = $fila['virtuemart_media_id'];
+					$Productos[$i]['IdMedia'][] = $fila['virtuemart_media_id'];
 				} else {
 					$y = $y +1; // Contador Productos que no tiene imagen asignada.
 				}
@@ -80,20 +74,25 @@
 	
 	
 	function ProductosImagenMal($Productos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor) {
-		// Ahora contamos productos que no tiene asignado imagen
+		// Ahora contamos las imagenes hay por producto y comprobamos que exista la imagen.
+		$array =array();
 		$i= 0 ;
 		$conImagenes = 0;
 		$ErrorImagenes = 0 ;
 		$campos = "`virtuemart_media_id`,`file_mimetype`,`file_url`";
 		$tabla = "_virtuemart_medias";
+		$IDmedia = '';
+		$Productos['countArray'] = count($Productos);
 		foreach ($Productos as $producto) {
 			$i++;
-			if ($producto['media_id'] > 0 ) {
+			if (count($producto['IdMedia']) > 0 ) {
 				$conImagenes++;
 				// Ahora obtenemo url de imagen
-				$whereC = " WHERE virtuemart_media_id=".$producto['media_id'];
+				$IDmedia = $producto['IdMedia'];
+				$Textomedia = implode(',',$IDmedia);
+				$whereC = " WHERE virtuemart_media_id IN(".$Textomedia.')';
 				$Consulta = $BDVirtuemart->query("SELECT ".$campos." FROM ".$prefijoTabla.$tabla.$whereC);
-				//~ $Productos[$i]['consulta'] = $whereC;
+				$Productos[$i]['consulta'] = $whereC;
 				if ($Consulta->num_rows >0){
 					// Quiere decir que obtuvo resultados.
 					$Productos[$i]['NImagenes'] = $Consulta->num_rows;
@@ -106,6 +105,7 @@
 						// Ahora añadimos contador de productos con error en imagenes
 						if ($resultado == 'Error' ){
 							$ErrorImagenes++;
+							$array[] = $Productos[$i]['product_id'];
 						}
 					}
 				} else {
@@ -113,11 +113,11 @@
 				}
 			}
 		}
-		
+		//~ 
 		$Productos['ConIDMedia'] = $conImagenes;
 		$Productos['SinIDMedia'] = $Productos['TotalProductos']-$Productos['ConIDMedia'];
 		$Productos['ErrorImagen'] = $ErrorImagenes;
-
+		$Productos['ArrayErrores'] = $array;
 		return $Productos;
 
 
@@ -128,9 +128,6 @@
 	function ComprobarImagen ($imagen)
 	{	
 		/* En está función enviamos la ruta de la imagen y nos devuelve un array con: 
-		* 	ancho 			-> 	pixel de ancho.
-		* 	alto			-> 	pixel de alto.
-		* 	tipoimagen	 	=> 'C' cuadrada, 'P' panoramica, 'V' vertical
 		* 	tipofichero 	=> 1,2,3,4,5,6 ( gif,jpg,png y más extensiones pero no la utilizo) ver funcion exif_imagetype()
  		* 	error			-> 	Si no exite el fichero que enviamos.
 		* 						Si no es una imagen.
@@ -209,23 +206,7 @@
 		return $IdArray;	
 	}	
 	
-	// Funcion para copiar imagen
-	// Url de origen http://www.abantos-autoparts.com/tienda/fotos/
-	function recibe_imagen($nombrefichero,$HostNombre){
-		$nombrefichero = trim($nombrefichero);
-		$url_origen = "http://www.abantos-autoparts.com/tienda/fotos/".$nombrefichero.'.jPG';
-		//~ $url ="http://multifrenos.es/images/headers/logoMultifrenos.png";
-		$proceso =  exif_imagetype($url_origen);
-		//~ if (file_exists($url_origen)){
-		$archivo_destino= $_SERVER['DOCUMENT_ROOT'].$HostNombre.'/BancoFotos/'.$nombrefichero.'.jpg';
-		$imagen = file_get_contents($url_origen);
-		$fs_archivo = file_put_contents($archivo_destino,$imagen);
-		//~ $proceso ='correcto';
-		//~ } else {
-		//~ $proceso ='error';
-		//~ }
-		return $proceso;
-	} 
+	
 
 	// Funcion para comprobar estado ( Si existe el fichero en el servidor )
 	function comprobarEstado($ficheros,$HostNombre,$DirImageProdVirtue){

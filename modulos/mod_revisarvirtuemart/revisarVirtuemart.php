@@ -80,8 +80,8 @@
 
 	<div class="container">
 		<div class="col-md-8">
-			<h1>Analizamos las imagenes de productos de virtuemart</h1>
-			<p>El objetivo es saber: </p>
+			<h1>Imagenes de productos en virtuemart</h1>
+			<p>El objetivo analizar imagenes de productos en virtuemart y saber: </p>
 			<ul> 
 			<li> <strong>Ficheros existentes:</strong> Cuantos ficheros existen en el directorio asignado a productos.</li>
 			<li> <strong>Ficheros No imagenes:</strong> Cuantos de esos ficheros no son imagenes o su extension no es correcto. </li>
@@ -154,9 +154,12 @@
 		</div>
 		
 		<script>
-         //~ // Se ejecuta cuando termina de carga toda la pagina.
+			var arrayConsulta;
+			var NEnviado=0;
+			// Se ejecuta cuando termina de carga toda la pagina.
             $(document).ready(function () {
                 comprobarProductos();
+                
                 
             });
         </script>
