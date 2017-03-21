@@ -198,7 +198,7 @@ function comprobarEstado(){
         <th>ID Producto</th>
         <th>Ref_gtin</th>
         <th>Local<a title="Comprobamos servidor local si existe">(!)</a></th>
-        <th>Abastros<a title="Comprobamos servidor abastros si existe">(!)</a></th>
+        <th>Buscar en internet<a title="Buscamos en google la referencia indicadad">(!)</a></th>
         <th>Proceso<a title="No existe, Copiada y Existe">(!)</a></th>
       </tr>
     </thead>
@@ -213,7 +213,7 @@ function comprobarEstado(){
 				<td><?php echo $Productos['product_id'];?></td>
 				<td><span id="nombreFichero<?php echo $i;?>"><?php echo $Productos['product_gtin'];?></span></td>
 				<td class="rowCompLocal"><span id="CompLocal<?php echo $i;?>"></span></td>
-				<td class="rowCompAbastro"><?php echo '<a href="http://www.abantos-autoparts.com/tienda/fotos/"'.$Productos['product_gtin'].'jPG">Link abastros</a>';?>"></span></td>
+				<td class="rowCompAbastro"><?php echo '<a href="https://www.google.es/search?q="'.$Productos['product_gtin'].'jpg">Buscar '.$Productos['product_gtin'].'</a>';?>"></span></td>
 				<td class="ProcesoEstado"><span id="Proceso<?php echo $i;?>"></span></td>
 
 			</tr>	
