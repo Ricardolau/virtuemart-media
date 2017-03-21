@@ -21,14 +21,6 @@ include_once ("./funciones.php");
 $pulsado = $_POST['pulsado'];
  
  switch ($pulsado) {
-	case 'CopiarFichero':
-	$nombrefichero = $_POST['fichero'];
-	$CopiarFicheros = recibe_imagen($nombrefichero,$HostNombre);
-	header("Content-Type: application/json;charset=utf-8");
-	echo json_encode($CopiarFicheros);
-       
-	break;
-	
 	case 'comprobarEstado':
 		$nombrefichero = $_POST['ficheros'];
         $ComprobarEstado = comprobarEstado($nombrefichero,$HostNombre,$DirImageProdVirtue);
@@ -39,11 +31,21 @@ $pulsado = $_POST['pulsado'];
 	
 	case 'comprobarProductos':
         $TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
-        //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
+        $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
         header("Content-Type: application/json;charset=utf-8");
-		echo json_encode($Todosproductos);
+		$algo='Devuelvo algo';
+		echo json_encode($productos);
         break;
 	
+	case 'ProductosImagen':
+        // Tanto podemos recibir uno mas productos, en un array
+        $TodosProductos = $_POST['ArrayEnviado'];
+
+        $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
+        header("Content-Type: application/json;charset=utf-8");
+		$algo='Devuelvo algo';
+		echo json_encode($productos);
+        break;
 }
  
 /* ===============  CERRAMOS CONEXIONES  ===============*/
