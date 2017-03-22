@@ -209,26 +209,32 @@
 	
 
 	// Funcion para comprobar estado ( Si existe el fichero en el servidor )
-	function comprobarEstado($ficheros,$HostNombre,$DirImageProdVirtue){
-		$resultado = array();
+	// funcion valida si el nombre del producto es igual a la referencia obtenida
+	function comprobarEstado($ficheros,$HostNombre,$DirImageProdVirtue,$checkID){
+		//~ $resultado = array();
 		$ArrayFicheros = array();
 		$Nficheros = count($ficheros);
 		$i = 1;
+		$x = 0; // ya que checkID empieza array 0
 		foreach ($ficheros as $fichero){
 			// Ahora si existe fichero en imagenes/product
-			$fichero_url = $_SERVER['DOCUMENT_ROOT'].$DirImageProdVirtue.$fichero.'.jpg';
+			$Nombrefichero = trim($fichero);
+			$fichero_url = $_SERVER['DOCUMENT_ROOT'].$DirImageProdVirtue.$Nombrefichero .'.jpg';
+			$resultado[$i]['Id'] = $checkID[$x];
+			$resultado[$i]['fichero'] = $fichero_url;
 			if (file_exists($fichero_url)){
-				$resultado[$i] = ' Existe';
-				$ArrayFicheros[$i]= $fichero_url;
+				$resultado[$i]['Existe'] = 'Si';
+				//~ $ArrayFicheros[$i]= $fichero_url;
 			} else {
-				$resultado[$i] = 'No Existe';
-				$ArrayFicheros[$i]= $fichero_url;
+				$resultado[$i]['Existe'] = 'No';
+				//~ $ArrayFicheros[$i]= $fichero_url;
 
 			} 
 			
 		$i++;
 		}
-		
+		// Ahora añadimos cuanto enviamos
+		$resultado['NObjetos'] =$i;
 		return $resultado;
 		
 		

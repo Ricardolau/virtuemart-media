@@ -23,8 +23,8 @@ $pulsado = $_POST['pulsado'];
  switch ($pulsado) {
 	case 'comprobarEstado':
 		$nombrefichero = $_POST['ficheros'];
-        $ComprobarEstado = comprobarEstado($nombrefichero,$HostNombre,$DirImageProdVirtue);
-        //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
+		$checkID = $_POST['checkID'];
+        $ComprobarEstado = comprobarEstado($nombrefichero,$HostNombre,$DirImageProdVirtue,$checkID);
         header("Content-Type: application/json;charset=utf-8");
 		echo json_encode($ComprobarEstado);
         break;

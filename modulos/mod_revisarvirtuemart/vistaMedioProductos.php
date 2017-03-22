@@ -9,6 +9,7 @@
 // Variable Globales
 var checkID;
 var nombreFichero;
+var Resultado;
 // Funcion para controlar lo pulsado (botones y link )
 function metodoClick(pulsado){
 	console.log("Inicimos switch de control pulsar");
@@ -23,9 +24,8 @@ function metodoClick(pulsado){
 			MarcarTodas();
 			break;
 			
-		case 'ComprobarEstado':
+		case 'ComprobarEstadoTodos':
 			// Quiere decir que pulso comprobar.
-			VerFicheroSeleccionado ();
 			comprobarEstado()
 			break;
 		default:
@@ -46,15 +46,14 @@ function MarcarTodas() {
 		valor = false;
 		
 	 }
+	console.log('Iniciamos bucle cambio checkFic');
 	$(".rowCheckFichero").each(function(){ 
 		i++;
 		//todos los que sean de la clase row1
 		$('input[name=checkFic'+i+']').prop("checked", valor);
-		console.log('Entro en cambio '+'checkFic'+i);
 	});
-	
+	console.log('Hemos cambios checkFic de '+$i);
 	return;
-	
 }
 
 // Funcion para leer los check que se seleccionaron
@@ -97,16 +96,15 @@ function VerFicheroSeleccionado (){
 // Funcion para comprobar si existe la imagen en la instalación de la web
 function comprobarEstado(){
 	// Comprobamos que si hay alguno seleccionado.
-	alert('Quieres comprobar Estado de todos?');
-	$('input[name=checkTotal]').prop("checked", true);
-	MarcarTodas();
+	console.log('Entramos en comprobarEstado');
 	VerFicheroSeleccionado();
 	if (nombreFichero){
 		// Obtenemos nombreFichero con check
 		// Script que utilizamos para ejecutar AJAX.
 		var parametros = {
-		 "pulsado" 	: 'comprobarEstado',
-		 "ficheros": nombreFichero
+			"pulsado" 	: 'comprobarEstado',
+			"ficheros": nombreFichero,
+			"checkID": checkID
 				};
 		$.ajax({
 			data:  parametros,
@@ -124,23 +122,27 @@ function comprobarEstado(){
 					$("#proceso").html("Termino");
 					console.log('Respuesta');
 					console.log(response);
-					//~ console.log(respuesta.length);
+					Resultado = response;
+					console.log(Resultado['NObjetos']);
 					//~ console.log(response.toSource());
-					for (var id in response){
-						console.log(response[id]);
-						if (response[id] === ' Existe'){
-							console.log( 'Disabled check'+ id);
-							$("#Proceso"+id).html("Existe ");
-							$('input[name=checkFic'+id+']').prop("checked", false);// De marco
-							$('input[name=checkFic'+id+']').attr("disabled", true); // Desactivo
-						} else {
-							console.log(' Ponemos no existe en proceso' +id);
-							$("#Proceso"+id).html("No existe servidor");
-
-						
-						}
-					}
+					if (Resultado['NObjetos']>0){
+						i= 0;
+						//~ for (var id in response){
+							//~ console.log(response[id]);
+							//~ if (response[id] === ' Existe'){
+								//~ console.log( 'Disabled check'+ id);
+								//~ $("#Proceso"+id).html("Existe ");
+								//~ $('input[name=checkFic'+id+']').prop("checked", false);// De marco
+								//~ $('input[name=checkFic'+id+']').attr("disabled", true); // Desactivo
+							//~ } else {
+								//~ console.log(' Ponemos no existe en proceso' +id);
+								//~ $("#Proceso"+id).html("No existe servidor");
+							//~ 
+							//~ }
+						//~ }
 					// Ahora desmarcamos todas..
+					}
+					console.log('Desmarcamos todos');
 					$('input[name=checkTotal]').prop("checked", false);
 					MarcarTodas();
 
@@ -187,6 +189,8 @@ function comprobarEstado(){
 	<div class="col-md-8">
 		<?php echo 'Nos faltan imagenes en productos:'.count($productosSinImagen);	?>
 		<?php echo 'Todos Productos:'.count($TodosProductos);	?>
+		<input type="button" href="javascript:;" onclick="comprobarEstado()" value="Comprobar"/>
+								
 	</div>
 	<div class="proceso" id="proceso">
 	<!-- Mostramos barra y proceso que realizamos -->
@@ -245,9 +249,13 @@ function comprobarEstado(){
 <script>
          //~ // Se ejecuta cuando termina de carga toda la pagina.
             $(document).ready(function () {
-                VerFicheroSeleccionado ();
-				comprobarEstado()
-                
+                //~ VerFicheroSeleccionado ();
+				if (confirm('No tienes seleccionada ninguno, quieres comprobar todos')){
+					alert('Quieres comprobar Estado de todos?');
+					$('input[name=checkTotal]').prop("checked", true);
+					MarcarTodas();
+					comprobarEstado()
+                }
                 
             });
         </script>
