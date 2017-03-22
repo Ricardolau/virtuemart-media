@@ -52,7 +52,7 @@ function MarcarTodas() {
 		//todos los que sean de la clase row1
 		$('input[name=checkFic'+i+']').prop("checked", valor);
 	});
-	console.log('Hemos cambios checkFic de '+$i);
+	console.log('Hemos cambios checkFic de '+i);
 	return;
 }
 
@@ -126,20 +126,23 @@ function comprobarEstado(){
 					console.log(Resultado['NObjetos']);
 					//~ console.log(response.toSource());
 					if (Resultado['NObjetos']>0){
-						i= 0;
-						//~ for (var id in response){
-							//~ console.log(response[id]);
-							//~ if (response[id] === ' Existe'){
-								//~ console.log( 'Disabled check'+ id);
-								//~ $("#Proceso"+id).html("Existe ");
-								//~ $('input[name=checkFic'+id+']').prop("checked", false);// De marco
-								//~ $('input[name=checkFic'+id+']').attr("disabled", true); // Desactivo
-							//~ } else {
-								//~ console.log(' Ponemos no existe en proceso' +id);
-								//~ $("#Proceso"+id).html("No existe servidor");
-							//~ 
-							//~ }
-						//~ }
+						var id;
+						for (i = 1; i <= Resultado['NObjetos']; i++) { 
+							id = parseInt(Resultado[i]['Check']);
+							console.log(Resultado[i]['NombreFichero']);
+							console.log(Resultado[i]['UrlFichero']);
+							console.log(Resultado[i]['Existe']);
+
+							if (Resultado[i]['Existe'] === 'Si'){
+								console.log( 'Disabled check'+ id);
+								$("#Proceso"+id).html("Existe ");
+								$('input[name=checkFic'+id+']').prop("checked", false);// De marco
+								$('input[name=checkFic'+id+']').attr("disabled", true); // Desactivo
+							} else {
+								console.log(' Ponemos no existe en proceso' +id);
+								$("#Proceso"+id).html("No existe servidor");
+							}
+						}
 					// Ahora desmarcamos todas..
 					}
 					console.log('Desmarcamos todos');

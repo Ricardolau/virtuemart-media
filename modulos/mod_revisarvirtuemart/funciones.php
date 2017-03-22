@@ -220,8 +220,10 @@
 			// Ahora si existe fichero en imagenes/product
 			$Nombrefichero = trim($fichero);
 			$fichero_url = $_SERVER['DOCUMENT_ROOT'].$DirImageProdVirtue.$Nombrefichero .'.jpg';
-			$resultado[$i]['Id'] = $checkID[$x];
-			$resultado[$i]['fichero'] = $fichero_url;
+			$resultado[$i]['Check'] = $checkID[$x];
+			$resultado[$i]['NombreFichero'] = $Nombrefichero;
+			$resultado[$i]['UrlFichero'] = $fichero_url;
+
 			if (file_exists($fichero_url)){
 				$resultado[$i]['Existe'] = 'Si';
 				//~ $ArrayFicheros[$i]= $fichero_url;
@@ -232,9 +234,10 @@
 			} 
 			
 		$i++;
+		$x++;
 		}
 		// Ahora añadimos cuanto enviamos
-		$resultado['NObjetos'] =$i;
+		$resultado['NObjetos'] =$i-1;
 		return $resultado;
 		
 		
