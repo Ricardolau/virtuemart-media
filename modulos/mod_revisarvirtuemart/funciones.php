@@ -21,9 +21,14 @@
 		$campo[1] ="P.virtuemart_product_id";
 		$campo[2] ="P.product_gtin";
 		$campo[3] ="M.virtuemart_media_id";
+		$campo[4] ="ES.product_name";
+		$campo[5] ="P.published";
+
 		$tabla[1] = $prefijoTabla."_virtuemart_products P";
 		$tabla[2] = $prefijoTabla."_virtuemart_product_medias M";
-		$ConsultaRelacionada = 'SELECT '.$campo[1].','.$campo[2].','.$campo[3].' FROM '.$tabla[1].' left join '.$tabla[2].' On '.$campo[1].'=M.virtuemart_product_id ORDER BY '.$campo[1].' ASC ';
+		$tabla[3] = $prefijoTabla."_virtuemart_products_es_es ES";
+		//~ $ConsultaRelacionada = 'SELECT '.$campo[1].','.$campo[2].','.$campo[3].' FROM '.$tabla[1].' left join '.$tabla[2].' On '.$campo[1].'=M.virtuemart_product_id ORDER BY '.$campo[1].' ASC ';
+		$ConsultaRelacionada = 'SELECT '.$campo[5].','.$campo[1].','.$campo[2].','.$campo[3].','.$campo[4].' FROM '.$tabla[1].' left join '.$tabla[2].' On '.$campo[1].'=M.virtuemart_product_id  left join '.$tabla[3].' On '.$campo[1].'=ES.virtuemart_product_id ORDER BY '.$campo[1].' ASC ';
 		$Query = $BDVirtuemart->query($ConsultaRelacionada);
 		$i = 0;
 		//~ $Productos['ErrorConsulta'] = $ConsultaRelacionada;
@@ -38,8 +43,11 @@
 				// Ejemplo montamos.:
 				/*Array
 				(
+					[published] => 1 ( Si esta publicada) ..
 					[product_id] => 5
 					[product_gtin] => D120004
+					[product_s_desc] => bRAZO DE ALGO
+
 					[IdMedia] => Array
 						(
 							[0] => 3978
@@ -53,6 +61,9 @@
 					$i++;
 					$Productos[$i]['product_id'] = $fila['virtuemart_product_id'];
 					$Productos[$i]['product_gtin'] = $fila['product_gtin'];
+					$Productos[$i]['product_name'] = $fila['product_name'];
+					$Productos[$i]['published'] = $fila['published'];
+
 				}
 				if (isset($fila['virtuemart_media_id'])){
 					$Productos[$i]['IdMedia'][] = $fila['virtuemart_media_id'];

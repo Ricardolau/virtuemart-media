@@ -174,10 +174,15 @@ function comprobarEstado(){
 	//~ print_r($TodosProductos);
 	//~ echo '</pre>';
 	foreach ($TodosProductos as $producto){
-		if (isset($producto['IdMedia']) != true && strlen($producto['product_gtin'])>0){
+		//~ if (isset($producto['IdMedia']) != true && strlen($producto['product_gtin'])>0){
+		if (isset($producto['IdMedia']) != true && $producto['product_id']>0){
+
 			$i++;
 			$productosSinImagen[$i]['product_gtin']=$producto['product_gtin'];
 			$productosSinImagen[$i]['product_id']=$producto['product_id'];
+			$productosSinImagen[$i]['product_name']=$producto['product_name'];
+			$productosSinImagen[$i]['published']=$producto['published'];
+
 		}
 	}
  if (isset($TodosProductos['ErrorConsulta'])){
@@ -204,9 +209,10 @@ function comprobarEstado(){
         <th>TODAS
         <input type="checkbox" name="checkTotal" value="0" onchange="metodoClick('TodaSeleccion');">
 		</th>
+		<th>Publicado</th>
         <th>ID Producto</th>
+        <th>Nombre</th>
         <th>Ref_gtin</th>
-        <th>Local<a title="Comprobamos servidor local si existe">(!)</a></th>
         <th>Google<a title="Realizamos link busqueda en google">(!)</a></th>
         <th>Proceso<a title="No existe, Copiada y Existe">(!)</a></th>
       </tr>
@@ -219,10 +225,18 @@ function comprobarEstado(){
 			?>
 			<tr>
 				<td class="rowCheckFichero"><input type="checkbox" name="checkFic<?php echo $i;?>" value="<?php echo $i;?>"></td>
+				<td><?php echo $Productos['published'];?></td>
 				<td><?php echo $Productos['product_id'];?></td>
-				<td><span id="nombreFichero<?php echo $i;?>"><?php echo $Productos['product_gtin'];?></span></td>
-				<td class="rowCompLocal"><span id="CompLocal<?php echo $i;?>"></span></td>
-				<td class="rowCompAbastro"><?php echo '<a href="https://www.google.es/search?q='.$Productos['product_gtin'].'.jpg" target="_blank">Buscar '.$Productos['product_gtin'].'</a>';?></span></td>
+				<td><span id="NombrProducto<?php echo $i;?>"><?php echo $Productos['product_name'];?></span></td>
+				<td class="rowCompLocal"><span id="nombreFichero<?php echo $i;?>"><?php echo $Productos['product_gtin'];?></span></td>
+				<td class="rowCompAbastro">
+					<a title="Buscar por GTIN" href="https://www.google.es/search?q=<?php echo $Productos['product_gtin'];?>" target="_blank">
+					<span class="glyphicon glyphicon-search"></span>
+					</a>
+					<a title="Buscar por Nombre" href="https://www.google.es/search?q=<?php echo $Productos['product_name'];?>" target="_blank">
+					<span style="padding-left:15px;" class="glyphicon glyphicon-search"></span>
+					</a>
+				</td>
 				<td class="ProcesoEstado"><span id="Proceso<?php echo $i;?>"></span></td>
 
 			</tr>	
