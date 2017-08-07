@@ -5,10 +5,32 @@
 	 * 
 	 * */
 
+	
+	
 	function filesProductos($RutaServidor,$DirImageProdVirtue)
 	{	
-	$files = array_filter(glob($RutaServidor.$DirImageProdVirtue."*"), 'is_file');
-	return $files ;
+		$LeerDir = array();
+		$ruta = $RutaServidor.$DirImageProdVirtue;
+		$filesDir = scandir($ruta);
+		$d= 0;
+		$f= 0;
+		foreach ($filesDir as $fileDir){
+			// Filtramos los . y .. que nos coje tb
+			if ($fileDir != '.' and $fileDir != '..'){
+				if (is_dir($ruta.$fileDir)){
+					if ( $fileDir != 'resized'){
+						$LeerDir['directorio'][$d]['Nombre'] = $fileDir;
+						$d++;
+					}
+				} else  {
+					$LeerDir['fichero'][$f]['Nombre'] = $fileDir;
+					$f++;
+				}
+			}
+		}
+		
+		//~ $files = array_filter(glob($RutaServidor.$DirImageProdVirtue."*"), 'is_file');
+		return $LeerDir ;
 	}
 	
 	function ObtenerProductos($BDVirtuemart,$prefijoTabla) {

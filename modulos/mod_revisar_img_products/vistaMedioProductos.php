@@ -164,7 +164,7 @@ function comprobarEstado(){
 		include './../../header.php';
 		include 'funciones.php';
 ?>
-<script src="<?php echo $HostNombre; ?>/modulos/mod_revisarvirtuemart/funciones.js"></script>
+<script src="<?php echo $HostNombre; ?>/modulos/mod_revisar_img_products/funciones.js"></script>
 <?php
 	$TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
  // Creamos array con producto que no tiene imagen

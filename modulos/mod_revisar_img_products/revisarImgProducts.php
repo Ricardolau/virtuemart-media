@@ -22,13 +22,19 @@
 		include './../../header.php';
 		include 'funciones.php';
 	?>
-    <script src="<?php echo $HostNombre; ?>/modulos/mod_revisarvirtuemart/funciones.js"></script>
+    <script src="<?php echo $HostNombre; ?>/modulos/mod_revisar_img_products/funciones.js"></script>
 <?php
 	// Inicializamos variable de inicio y entorno:
 	$error ='';
 	$ficheros = array ();
-	//Creamos array de ficheros que existene en el directorio
-	$files = filesProductos($RutaServidor,$DirImageProdVirtue); 
+	//Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
+	$DirectoriosFiles = filesProductos($RutaServidor,$DirImageProdVirtue); 
+	// Obtenemos files y directorios 
+	$files = $DirectoriosFiles['fichero'];
+	$directorios = $DirectoriosFiles['directorio'];
+	
+	//~ $directorios = array_column($registros, 'directorio');
+	//~ $files 
 	// Ahora obtenemos productos.
 	$TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
 	if (isset($TodosProductos['ErrorConsulta'])){
@@ -43,7 +49,7 @@
 	$Media = ObtenerDatosMedia( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla );
 	if ($Media['NumeroFiles']!= count($files)){
 		// Quiere decir que el numero ficheros y el numero registros de media_product no son iguales
-		$error .= '<p>Hubo en error en Media ya que obtuvo la misma cantidad ficheros... </p>';
+		$error .= '<p>Hubo en error en Media ya que NO obtuvo la misma cantidad ficheros... </p>';
 	}
 	// Obtenemos el valores de [Existe] y de [virtuemart_product_id]
 	$CArrayExiste = array_count_values(array_column($Media, 'Existe'));// Creamos array suma de resultados
@@ -77,21 +83,31 @@
 	} 
 	
 	?>
+	
+	<?php 
+	// Código para debug
+	echo '<pre>';
+	print_r($files);
+	echo '</pre>';
+	?>
+	
 
 	<div class="container">
+		<div class="col-md-12"><h1>Analizamos Imagenes de productos en virtuemart</h1></div>
 		<div class="col-md-8">
-			<h1>Imagenes de productos en virtuemart</h1>
-			<p>El objetivo analizar imagenes de productos en virtuemart y saber: </p>
+			<h3>Objetivo:</h3>
+			<p>El objetivo es analizar las imagenes de productos en virtuemart y saber: </p>
 			<ul> 
-			<li> <strong>Ficheros existentes:</strong> Cuantos ficheros existen en el directorio asignado a productos.</li>
-			<li> <strong>Ficheros No imagenes:</strong> Cuantos de esos ficheros no son imagenes o su extension no es correcto. </li>
-			<li> <strong>Ficheros No existen Media:</strong> Cuantos ficheros existen directorio y no en tabla de Media</li>
-			<li> <strong>Media Registros:</strong> Cuantos registros hay en virtuemart_media (solo tipo producto).</li>
-			<li> <strong>Media url No encuentra:</strong> Comprobamos cuantas urls de media no son correctas.</li>
-			<li> <strong>Media Reg.No utiliza:</strong> Cuantos registros de virtuemart_media de tipo product no se utilizan.</li>
+			<li> <strong>Carpetas:</strong>Saber cuantas y cuales son las carpetas existen en el directorio asigando para los productos</li>
+			<li> <strong>Ficheros existentes:</strong> Cuantos ficheros existen en cada esas carpetas.</li>
+			<li> <strong>Ficheros No imagenes:</strong> Cuantos ficheros no son imagenes o su extension no es correcto. </li>
+			<li> <strong>Ficheros Existen Media:</strong> Cuantos ficheros existen directorio asignado para productos en virtuemart</li>
+			<li> <strong>Ficheros No utiliza Media:</strong> Cuantos registros de virtuemart_media de tipo product no se utilizan.</li>
+			<li> <strong>Registros en Media:</strong> Cuantos registros hay en virtuemart_media (solo tipo producto).</li>
+			<li> <strong>Url de Media mal:</strong> Comprobamos cuantas urls de media no son correctas.</li>
 			<li> <strong>Productos Total:</strong>Cantidad de Productos que hay.</li>
 			<li> <strong>Productos sin imagen:</strong>Que productos no tiene imagen asignada.</li>
-			<li> <strong>Productos Imagen Mal:</strong>Cuantos productos tiene una imagen MAL asignada, no existe.</li>
+			<li> <strong>Productos Imagen Mal:</strong>Cuantos productos tiene una imagen MAL asignada o no existe.</li>
 			</ul> 
 			
 		</div>
@@ -107,6 +123,12 @@
 		</div>
 		<div class="col-md-12">
 		<h4>Resultado</h4>
+			<div>
+				<div class="floatL marginL20">
+					Directorios 
+					<span class="label label-default"><?php echo count($directorios);?></span>
+				</div>
+			</div>
 			<div>
 				<div class="floatL marginL20">
 					Ficheros existentes 
