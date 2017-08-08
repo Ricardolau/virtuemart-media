@@ -3,19 +3,19 @@
  * Recortando al tamaño más grande posible.
  * Creando una imagen cuadrada en una carpeta que le indiquemos.
  */
-
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
 <?php
 	include './../../head.php';
 	include './../../modulos/mod_conexion/conexionBaseDatos.php';
-?>
-
-
-
+// Ahora comprobamos hay parametros en la url
+if (isset($_GET['directorio'])) {
+	$directorioActual = $_GET['directorio'];
+} else {
+	$directorioActual = 'raiz';
+}?>
 </head>
 <body>
 	<?php 
@@ -26,15 +26,24 @@
 <?php
 	// Inicializamos variable de inicio y entorno:
 	$error ='';
+	$ruta = $RutaServidor.$DirImageProdVirtue;
 	$ficheros = array ();
+	//Si estamos en un sub-directorio entonce $DirImageProdVirtue cambia....
+	if ($directorioActual != 'raiz'){
+		$DirImageProdVirtue = $DirImageProdVirtue.$directorioActual.'/';
+		$ruta = $ruta.$directorioActual.'/';
+	}
 	//Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
 	$DirectoriosFiles = filesProductos($RutaServidor,$DirImageProdVirtue); 
 	// Obtenemos files y directorios 
 	$files = $DirectoriosFiles['fichero'];
 	$directorios = $DirectoriosFiles['directorio'];
+	// Ahora obtenemos los ficheros que no son jpg o png
+	$instruccion = "find ".$ruta." -mindepth 1 -maxdepth 1 -type f \! \( -iname '*jpg' -or -iname '*png' \)";
+	// Obtenemos los ficheros que no son jpg , ni png
+	exec($instruccion,$out,$e);
+	$ficheros['NoImagenes']= $out;
 	
-	//~ $directorios = array_column($registros, 'directorio');
-	//~ $files 
 	// Ahora obtenemos productos.
 	$TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
 	if (isset($TodosProductos['ErrorConsulta'])){
@@ -69,25 +78,18 @@
 	}
 	// Obtenemos array de producto.
 	$productos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
-	// Ahora nos falta solo los datos de:
-	// Ficheros que no son imagenes en el directorio .
-	// Ficheros que no existen en Media
-	// Los registros Media que no encuentra URL
-	// Los registros en Media que no se utilizan en producto.
-	
-	
+		
 	// Si hubo error antes mostrar container , se bloquea ...
 	if ($error != ''){
 	 echo '<div class= "container"><h4>Hubo un error</h4>'.$error.'</div>';
 	 exit;	
 	} 
-	
-	?>
-	
+?>
+
 	<?php 
 	// Código para debug
 	echo '<pre>';
-	print_r($files);
+	print_r($out);
 	echo '</pre>';
 	?>
 	
@@ -96,68 +98,77 @@
 		<div class="col-md-12"><h1>Analizamos Imagenes de productos en virtuemart</h1></div>
 		<div class="col-md-8">
 			<h3>Objetivo:</h3>
-			<p>El objetivo es analizar las imagenes de productos en virtuemart y saber: </p>
-			<ul> 
-			<li> <strong>Carpetas:</strong>Saber cuantas y cuales son las carpetas existen en el directorio asigando para los productos</li>
-			<li> <strong>Ficheros existentes:</strong> Cuantos ficheros existen en cada esas carpetas.</li>
-			<li> <strong>Ficheros No imagenes:</strong> Cuantos ficheros no son imagenes o su extension no es correcto. </li>
-			<li> <strong>Ficheros Existen Media:</strong> Cuantos ficheros existen directorio asignado para productos en virtuemart</li>
-			<li> <strong>Ficheros No utiliza Media:</strong> Cuantos registros de virtuemart_media de tipo product no se utilizan.</li>
-			<li> <strong>Registros en Media:</strong> Cuantos registros hay en virtuemart_media (solo tipo producto).</li>
-			<li> <strong>Url de Media mal:</strong> Comprobamos cuantas urls de media no son correctas.</li>
-			<li> <strong>Productos Total:</strong>Cantidad de Productos que hay.</li>
-			<li> <strong>Productos sin imagen:</strong>Que productos no tiene imagen asignada.</li>
-			<li> <strong>Productos Imagen Mal:</strong>Cuantos productos tiene una imagen MAL asignada o no existe.</li>
-			</ul> 
+			<p>El objetivo es analizar las imagenes que utilizan los productos de virtuemart, tanto los registros en la tablas como los directorios donde se guardan los ficheros.</p>
+			<p>La tabla donde se guardan las rutas es //prefijo//_virtuemart_medias.</p>
+			<p>La tabla donde se guarda que imagenes utiliza un producto, es //prefijo_virtuemart_product_medias</p>
+			
 			
 		</div>
 		<div class="col-md-4">
-			<h3>Pasos que realizamos</h3>
-			<ol>
-				<li>Array ficheros en directorio virtuemart/product</li>
-				<li>Buscamos el campo `virtuemart_media_id` en la tabla `$prefijoTabla_virtuemart_medias` que contenga direccion del fichero en el campo 'file_url'.</li>
-				<li>Buscamos el id 'vituemart_media_id' en la tabla `$prefijoTabla_virtuemart_product_medias`  para saber si se usa en algún producto, si no se usa entonces </li>	
-			</ol>		
+			<h3>Barra de proceso</h3>
 			<div id="proceso">
 			</div>
 		</div>
 		<div class="col-md-12">
-		<h4>Resultado</h4>
-			<div>
-				<div class="floatL marginL20">
-					Directorios 
+		
+			<!-- Mostramos rutero de carpetas -->
+			<div class="col-md-3">
+				<h4>Analisis de directorio:</h4>
+				<p>Saber cuantas y cuales son las carpetas existen en el directorio asigando para los productos</p>
+				<h5><strong>Directorio actual:<?php echo '/'.$directorioActual;?></strong></h5>
+				<?php if ($directorioActual != 'raiz') { ?>
+					<a href="./revisarImgProducts.php">
+				<?php } ?>
+				<span class="glyphicon glyphicon-home"></span>
+				<?php if ($directorioActual != 'raiz') { ?>
+					</a> 
+				<?php } ?>
+				<div>
+					Sub-Directorios 
 					<span class="label label-default"><?php echo count($directorios);?></span>
 				</div>
+				<?php
+					// Mostramos las carpetas
+					foreach ($directorios as $directorio){
+						echo '-> '; // Separador...
+						if ($directorioActual != $directorio['Nombre']) { ?>
+								<a href="?<?php echo'&directorio='.$directorio['Nombre']?>">
+						<?php }
+						echo $directorio['Nombre']; 
+						if ($directorioActual != $directorio['Nombre']) { ?>
+								</a><br/>
+						<?php }
+					}
+				?>
 			</div>
-			<div>
+			<div class="col-md-3">
+				<h4>Analisis de Ficheros:</h4>
+				<p>Analizamos los ficheros que dentro del directorio</p>
+				<ul> 
+					<li> <strong>Ficheros existentes:</strong> Cuantos ficheros existen en cada esas carpetas.</li>
+					<li> <strong>Ficheros No imagenes:</strong> Cuantos ficheros no son imagenes o su extension no es correcto. </li>
+					<li> <strong>Ficheros No utiliza Media:</strong> Cuantos registros de virtuemart_media de tipo product no se utilizan.</li>
+				</ul> 
 				<div class="floatL marginL20">
 					Ficheros existentes 
 					<span class="label label-default"><?php echo $Media['NumeroFiles'];?></span>
 				</div>
 				<div class="floatL marginL20">
 					Ficheros NO imagenes 
-					<span class="label label-default">?</span>
+					<span class="label label-default"><?php echo count($ficheros['NoImagenes']);?></span>
 				</div>
 				<div class="floatL marginL20">
 					Ficheros No Media 
 					<span class="label label-default">?</span>
 				</div>
 			</div>
-			<div>
-				<div class="floatL marginL20">
-					Media Total Reg
-						<span class="label label-default"><?php echo $Media['NRegProducto'];?></span>
-				</div>
-				<div class="floatL marginL20">
-					Media url No encuentra 
-					<span class="label label-default"><?php echo $MediaResumen['NoUrl'];?></span>
-				</div>
-				<div class="floatL marginL20">
-					Media Reg.No utiliza 
-					<span class="label label-default"><?php echo $MediaResumen['NoUtiliza'];?></span>
-				</div>
-			</div>
-			<div>
+			<div class="col-md-3">
+				<h4>Analisis de Productos:</h4>
+				<ul>
+					<li> <strong>Productos Total:</strong>Cantidad de Productos que hay.</li>
+					<li> <strong>Productos sin imagen:</strong>Que productos no tiene imagen asignada.</li>
+					<li> <strong>Productos Imagen Mal:</strong>Cuantos productos tiene una imagen MAL asignada o no existe.</li>
+				</ul>
 				<div class="floatL marginL20">
 					Productos Total 
 					<span class="label label-default"><?php echo $productos['TotalProductos'];?> </span>
@@ -173,6 +184,29 @@
 					<span id="PMImagen" class="label label-default">? </span>
 				</div>
 			</div>
+			
+			<div class="col-md-3">
+				<h4>Analisis de Medios:</h4>
+				<p>Llamamos Medios, a la tabla que utiliza virtuemart para "Gestion de Medios"</p>
+				<ul>
+					<li> <strong>Registros en Media:</strong> Cuantos registros hay en virtuemart_media (solo tipo producto).</li>
+					<li> <strong>Url de Media mal:</strong> Comprobamos cuantas urls de media no son correctas.</li>
+				</ul>
+				<div class="floatL marginL20">
+					Media Total Reg
+						<span class="label label-default"><?php echo $Media['NRegProducto'];?></span>
+				</div>
+				<div class="floatL marginL20">
+					Media url No encuentra 
+					<span class="label label-default"><?php echo $MediaResumen['NoUrl'];?></span>
+				</div>
+				<div class="floatL marginL20">
+					Media Reg.No utiliza 
+					<span class="label label-default"><?php echo $MediaResumen['NoUtiliza'];?></span>
+				</div>
+			</div>
+			
+
 		</div>
 		
 		<script>
@@ -186,10 +220,6 @@
             });
         </script>
         
-	
-	
-	
-	
-</body>
+	</body>
 </html>
 

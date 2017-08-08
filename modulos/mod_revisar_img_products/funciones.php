@@ -20,6 +20,8 @@
 				if (is_dir($ruta.$fileDir)){
 					if ( $fileDir != 'resized'){
 						$LeerDir['directorio'][$d]['Nombre'] = $fileDir;
+						//~ $LeerDir['directorio'][$d]['Ruta'] = $ruta.$fileDir;
+
 						$d++;
 					}
 				} else  {
