@@ -5,7 +5,25 @@
 	 * 
 	 * */
 
-	
+	function ObtenerDirectorios($ruta) {
+		// Instruccion a utilizar find .ruta -mindepth 1 -maxdepth 1 -type d
+		$Nletras = strlen($ruta);
+		$LeerDir = array();
+		$instruccion = "find ".$ruta." -mindepth 1 -maxdepth 1 -type d";
+		exec($instruccion,$out,$e);
+
+		$d= 0;
+		foreach ($out as $rutaDirectorio){
+			// Extraemos nombre directorio.
+			$nombre=substr($rutaDirectorio, $Nletras);
+			if ( $nombre != 'resized'){
+				$LeerDir[$d]['Nombre'] = $nombre;
+				$d++;
+			}
+		}
+		
+		return $LeerDir;
+	}
 	
 	function filesProductos($RutaServidor,$DirImageProdVirtue)
 	{	

@@ -27,58 +27,64 @@ if (isset($_GET['directorio'])) {
 	// Inicializamos variable de inicio y entorno:
 	$error ='';
 	$ruta = $RutaServidor.$DirImageProdVirtue;
+	
 	$ficheros = array ();
 	//Si estamos en un sub-directorio entonce $DirImageProdVirtue cambia....
 	if ($directorioActual != 'raiz'){
 		$DirImageProdVirtue = $DirImageProdVirtue.$directorioActual.'/';
 		$ruta = $ruta.$directorioActual.'/';
 	}
-	//Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
-	$DirectoriosFiles = filesProductos($RutaServidor,$DirImageProdVirtue); 
-	// Obtenemos files y directorios 
-	$files = $DirectoriosFiles['fichero'];
-	$directorios = $DirectoriosFiles['directorio'];
-	// Ahora obtenemos los ficheros que no son jpg o png
+	// Obtenemos directorios
+	$directorios = ObtenerDirectorios($ruta);
+	
+	// Obtenemos los ficheros que no son imagenes(jpg o png)
 	$instruccion = "find ".$ruta." -mindepth 1 -maxdepth 1 -type f \! \( -iname '*jpg' -or -iname '*png' \)";
-	// Obtenemos los ficheros que no son jpg , ni png
 	exec($instruccion,$out,$e);
 	$ficheros['NoImagenes']= $out;
 	
-	// Ahora obtenemos productos.
-	$TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
+	// Obtenemos productos.
+	$productos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
 	if (isset($TodosProductos['ErrorConsulta'])){
 		// Ahora comprobamos si hubo un error en la consulta,
 		$error = '<p>Error de conexion con la base de datos o no hay articulos pasados</p>';
 		$error .= '<p>'.$TodosProductos['ErrorConsulta'].'</p>';
 	}	
+	
+	//~ //Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
+	//~ $DirectoriosFiles = filesProductos($RutaServidor,$DirImageProdVirtue); 
+	//~ // Obtenemos files y directorios 
+	//~ $files = $DirectoriosFiles['fichero'];
+	//~ // $directorios = $DirectoriosFiles['directorio'];
+	
+	
+	
 	// Ahora comprobamos:
 	//		1.- Registros que hay en tabla Media
 	//		2.- Que registros no se utilizan
 	//		3.- Si todos los registros (url) son correcta y existen.
-	$Media = ObtenerDatosMedia( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla );
-	if ($Media['NumeroFiles']!= count($files)){
-		// Quiere decir que el numero ficheros y el numero registros de media_product no son iguales
-		$error .= '<p>Hubo en error en Media ya que NO obtuvo la misma cantidad ficheros... </p>';
-	}
+	
+	//~ $Media = ObtenerDatosMedia( $files, $BDVirtuemart,$prefijoTabla,$RutaServidor,$DirInstVirtuemart,$prefijoTabla );
+	//~ if ($Media['NumeroFiles']!= count($files)){
+		//~ // Quiere decir que el numero ficheros y el numero registros de media_product no son iguales
+		//~ $error .= '<p>Hubo en error en Media ya que NO obtuvo la misma cantidad ficheros... </p>';
+	//~ }
 	// Obtenemos el valores de [Existe] y de [virtuemart_product_id]
-	$CArrayExiste = array_count_values(array_column($Media, 'Existe'));// Creamos array suma de resultados
-	$ArrayId = array_count_values(array_column($Media, 'virtuemart_product_id'));// Creamos array suma de resultados
-	//~ $ArrayId = array_column($Media,'virtuemart_product_id');
+	//~ $CArrayExiste = array_count_values(array_column($Media, 'Existe'));// Creamos array suma de resultados
+	//~ $ArrayId = array_count_values(array_column($Media, 'virtuemart_product_id'));// Creamos array suma de resultados
+	// $ArrayId = array_column($Media,'virtuemart_product_id');
 	//Ahora montamos array (MediaResumen)
-	if (isset($CArrayExiste['no'])){
-		$MediaResumen['NoUrl'] = $CArrayExiste['no'];
-	} else {
-		$MediaResumen['NoUrl'] =0;
-	}
-	if (isset($ArrayId[0])){
-		
-		$MediaResumen['NoUtiliza'] = $ArrayId[0]; // Cantidad de registro que id producto es 0
-	}else{
-		$MediaResumen['NoUtiliza'] = 0;
-	}
-	// Obtenemos array de producto.
-	$productos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
-		
+	//~ if (isset($CArrayExiste['no'])){
+		//~ $MediaResumen['NoUrl'] = $CArrayExiste['no'];
+	//~ } else {
+		//~ $MediaResumen['NoUrl'] =0;
+	//~ }
+	//~ if (isset($ArrayId[0])){
+		//~ 
+		//~ $MediaResumen['NoUtiliza'] = $ArrayId[0]; // Cantidad de registro que id producto es 0
+	//~ }else{
+		//~ $MediaResumen['NoUtiliza'] = 0;
+	//~ }
+			
 	// Si hubo error antes mostrar container , se bloquea ...
 	if ($error != ''){
 	 echo '<div class= "container"><h4>Hubo un error</h4>'.$error.'</div>';
@@ -88,9 +94,14 @@ if (isset($_GET['directorio'])) {
 
 	<?php 
 	// Código para debug
-	echo '<pre>';
-	print_r($out);
-	echo '</pre>';
+	//~ echo $directorioActual;
+	//~ echo '<pre>';
+	//~ print_r($directorios);
+	//~ echo '</pre>';
+	//~ echo '<pre>';
+	//~ print_r($_GET);
+	//~ echo '</pre>';
+	
 	?>
 	
 
@@ -144,18 +155,25 @@ if (isset($_GET['directorio'])) {
 			<div class="col-md-3">
 				<h4>Analisis de Ficheros:</h4>
 				<p>Analizamos los ficheros que dentro del directorio</p>
-				<ul> 
-					<li> <strong>Ficheros existentes:</strong> Cuantos ficheros existen en cada esas carpetas.</li>
-					<li> <strong>Ficheros No imagenes:</strong> Cuantos ficheros no son imagenes o su extension no es correcto. </li>
+				<ul style="padding-left:15px;"> 
+					<li> <strong>Total Ficheros:</strong> Cuantos ficheros existen en esta carpeta <strong><?php echo '/'.$directorioActual;?></strong></li>
+					<li> <strong>Ficheros No imagenes:</strong> Cuantos no son imagenes (jpg o png). </li>
 					<li> <strong>Ficheros No utiliza Media:</strong> Cuantos registros de virtuemart_media de tipo product no se utilizan.</li>
 				</ul> 
 				<div class="floatL marginL20">
-					Ficheros existentes 
+					Total Ficheros 
 					<span class="label label-default"><?php echo $Media['NumeroFiles'];?></span>
 				</div>
+				
 				<div class="floatL marginL20">
+					<?php if (count($ficheros['NoImagenes'])>0){
+					$advertencia= 'warning';
+					} else {
+					$advertencia= 'default';
+					}
+					?>
 					Ficheros NO imagenes 
-					<span class="label label-default"><?php echo count($ficheros['NoImagenes']);?></span>
+					<span class="label label-<?php echo $advertencia; ?>"><?php echo count($ficheros['NoImagenes']);?></span>
 				</div>
 				<div class="floatL marginL20">
 					Ficheros No Media 
@@ -181,7 +199,7 @@ if (isset($_GET['directorio'])) {
 				</div>
 				<div class="floatL marginL20">
 					Productos Mal imagen 
-					<span id="PMImagen" class="label label-default">? </span>
+					<span id="PMImagen" class="label label-default"> ? </span>
 				</div>
 			</div>
 			
@@ -210,11 +228,13 @@ if (isset($_GET['directorio'])) {
 		</div>
 		
 		<script>
-			var arrayConsulta;
-			var NEnviado=0;
+			var arrayProcesos = new Array("Proceso", "Proceso1", "Proceso2");
+			var ProcesoActual = '';
+			var segundero = 0;
+			var contador; 
 			// Se ejecuta cuando termina de carga toda la pagina.
             $(document).ready(function () {
-                comprobarProductos();
+                procesosPendientes();
                 
                 
             });

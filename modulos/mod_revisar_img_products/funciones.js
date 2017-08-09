@@ -1,3 +1,12 @@
+function procesosPendientes() {
+	// Aquí lo que hacemos es ejecutar los procesos que tardan
+		textoMostrar = "Iniciamos ciclos que tardan.";
+		$("#proceso").html(textoMostrar);
+		// Iniciamos ciclo;
+		contador = setInterval(ponSegundero, 1000); 
+		return;
+	}
+
 function comprobarProductos() {
 	// Script que utilizamos para ejecutar funcion de php.
 	var parametros = {
@@ -26,46 +35,40 @@ function comprobarProductos() {
 	});
 	return;
 }
-function ciclo(){
-	if (NEnviado <= arrayConsulta['TotalProductos']){
-		var ItemsEnviar = [];
-		for (i = 0; i < 1200; i++) {  
-			if (NEnviado <= arrayConsulta['TotalProductos']){
-				// Montamos array para enviar por AJAX
-				ItemsEnviar[i] = arrayConsulta[NEnviado];
-				NEnviado = NEnviado + 1;
-			}
+function controlCiclo(){
+	// Buscamos el indice del array de procesos
+	if (ProcesoActual != '') {
+		var Nindice = arrayProcesos.indexOf(ProcesoActual);
+		// Si el resultado es -1 quiere decir que esta fuera rango.
+		if (Nindice >= 0){
+			console.log('Proceso Actual:'+ProcesoActual+' indice.'+Nindice);
+			Nindice = Nindice + 1
+			ProcesoActual = arrayProcesos[Nindice];
 		}
-		// Ahora ejecutamos ajax ProductosImagen
-		var parametros = {
-			'pulsado': 'ProductosImagen',
-			'ArrayEnviado':ItemsEnviar
-			
-		};
-		$.ajax({
-			data: parametros,
-			url: 'tareas.php',
-			type: 'post',
-			datatype: 'json',
-			beforeSend: function () {
-				textoMostrar = "Comprobando Imagenes de Productos";
-				$("#proceso").html(textoMostrar);
+		
+	} else {
+		// Empezamos el primer proceso.
+		ProcesoActual = arrayProcesos[0];
 
-			},
-			success: function (response) {
-				alert("estoy en respuesta");
-				textoMostrar = "Terminamos este bloque productos";
-				$("#proceso").html(textoMostrar);
-				console.log('Resultado')
-				console.log('Total enviado'+ response['countArray']);
-				console.log('Total arrayConsulta' +arrayConsulta['TotalProductos']);
-				console.log(response.toSource());
-			}
-		});
-		
-		
-		
-
+		}
 	
+	
+	
+	console.log(segundero);
+	// Si el segundero esta al maximos permitido (10) o Nindice es menor 0 , quiere decir que termino
+	if (segundero > 10  || Nindice< 0) {
+		clearInterval(contador);
+		$("#proceso").html('Termino ultimo proceso o por tiempo '+segundero +' s');
+
+		alert('termino procesos');
 	}
+	
 }
+	
+function ponSegundero(){
+	segundero= segundero +1;
+	$("#proceso").html('Iniciamos '+ProcesoActual+' tiempo '+segundero +' s');
+	controlCiclo();
+	
+}
+
