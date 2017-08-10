@@ -67,9 +67,9 @@
 	}
 	
 	//Obtenemos la cantidad de ficheros que no se utilizan en virtuemart_media.
-	if ($ficheros['Total']){
-		$ficheros['ImgNoUtilizadas']= fileNoUtilizados ($BDVirtuemart,$prefijoTabla,$files,$Dir_Actual);
-	} 
+	//~ if ($ficheros['Total']){
+		//~ $ficheros['ImgNoUtilizadas']= fileNoUtilizados ($BDVirtuemart,$prefijoTabla,$files,$Dir_Actual);
+	//~ } 
 	
 	// Ahora comprobamos:
 	//		1.- Registros que hay en tabla Media
@@ -108,9 +108,9 @@
 	<?php 
 	// Código para debug
 	//~ echo $DirImageProdVirtue;
-	echo '<pre>';
-	print_r($ficheros['ImgNoUtilizadas']);
-	echo '</pre>';
+	//~ echo '<pre>';
+	//~ print_r($ficheros['ImgNoUtilizadas']);
+	//~ echo '</pre>';
 	//~ echo '<pre>';
 	//~ print_r($files );
 	//~ echo '</pre>';
@@ -241,7 +241,9 @@
 		</div>
 		
 		<script>
-			var arrayProcesos = new Array("Proceso", "Proceso1", "Proceso2");
+			
+			var NomDirActual = '<?php echo $Nom_Dir_Actual;?>';
+			var arrayProcesos = new Array("ImagenesQueNoseUtilizan", "Proceso1", "Proceso2");
 			var ProcesoActual = '';
 			var segundero = 0;
 			var contador; 

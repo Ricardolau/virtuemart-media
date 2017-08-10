@@ -1,11 +1,11 @@
 function procesosPendientes() {
 	// Aquí lo que hacemos es ejecutar los procesos que tardan
-		textoMostrar = "Iniciamos ciclos que tardan.";
-		$("#proceso").html(textoMostrar);
-		// Iniciamos contador;
-		contador = setInterval(ponSegundero, 1000); 
-		
-		return;
+	textoMostrar = "Buscando proceso ....";
+	$("#proceso").html(textoMostrar);
+	// Iniciamos contador;
+	contador = setInterval(ponSegundero, 1000); 
+	
+	return;
 	}
 
 function comprobarProductos() {
@@ -59,6 +59,14 @@ function controlCiclo(){
 
 		alert('termino procesos');
 	}
+	// Swich de procesos...
+	switch(ProcesoActual) {
+		case 'ImagenesQueNoseUtilizan':
+			ImagenesQueNoseUtilizan();
+			break;
+		
+		
+	} 
 	
 }
 	
@@ -71,3 +79,31 @@ function ponSegundero(){
 	
 }
 
+function ImagenesQueNoseUtilizan(){
+	// Funcion para ver se utilizan todos los ficheros del directorio.
+	var parametros = {
+	 "pulsado" 	: 'ImagenesQueNoseUtilizan',
+	 "Nom_Dir_actual":	NomDirActual
+			};
+	$.ajax({
+		data:  parametros,
+		url:   'tareas.php',
+		type:  'post',
+		beforeSend: function () {
+				$("#proceso").html('Comprobando si las imagenes del directorio '+NomDirActual+' se utilizan<span><img src="./img/ajax-loader.gif"/></span>');
+				
+		},
+		success:  function (response) {
+				// Cuando se recibe un array con JSON tenemos que parseJSON
+				//~ var resultado =  $.parseJSON(response)
+				$("#proceso").html('Terminado la comprobacion si las imagenes del directorio '+NomDirActual+' se utilizan');
+				//arrayConsulta = response;
+				//~ if (arrayConsulta['TotalProductos'] > 0 ){
+					//~ NEnviado = 0
+					//~ ciclo();
+				//~ }
+		}
+	});
+	return;
+	
+}

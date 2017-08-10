@@ -28,7 +28,7 @@ $pulsado = $_POST['pulsado'];
 			$Dir_Actual = $DirImageProdVirtue.$_POST['Nom_Dir_actual'].'/';
 		}
 		$files = filesProductos($RutaServidor,$Dir_Actual,$DirInstVirtuemart);
-		$ficherosNoUtilizado = fileNoUtilizados ($BDVirtuemart,$prefijoTabla,$files,$Dir_Actual)
+		$ficherosNoUtilizado = fileNoUtilizados ($BDVirtuemart,$prefijoTabla,$files,$Dir_Actual);
 		header("Content-Type: application/json;charset=utf-8");
 		echo json_encode($ficherosNoUtilizado);
 		break;
