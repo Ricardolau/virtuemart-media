@@ -24,11 +24,11 @@
 		return $LeerDir;
 	}
 	
-	function filesProductos($RutaServidor,$DirImageProdVirtue)
+	function filesProductos($RutaServidor,$Dir_Actual,$DirInstVirtuemart)
 	{	
 		// Obtener las rutas de los ficheros.
 		$LeerFiles = array();
-		$ruta = $RutaServidor.$DirImageProdVirtue;
+		$ruta = $RutaServidor.$DirInstVirtuemart.$Dir_Actual;
 		if (is_dir($ruta) === false){
 			$LeerFiles['error'] = ' Ruta mal, '.$ruta;
 			return $LeerFiles;
@@ -42,9 +42,33 @@
 				$f++;
 			}
 		}
-		
-		//~ $files = array_filter(glob($RutaServidor.$DirImageProdVirtue."*"), 'is_file');
 		return $LeerFiles ;
+	}
+	
+	function fileNoUtilizados ($BDVirtuemart,$prefijoTabla,$files,$ruta) {
+		// Consultamos cuantos ficheros de este directorio no se utilizan.
+		$ficheroError = array();
+		$ficheros = array_column($files, 'fichero');
+		$i= 0;
+		$e= 0;
+		// a la $ruta le quitamos / si la trae al principio.
+		if ($ruta[0] === '/'){
+			$ruta = substr($ruta, 1);
+		}
+		foreach ($ficheros as $fichero){
+			$ficheros[$i] = $ruta.$fichero;
+			$Sql = "SELECT * FROM ".$prefijoTabla."_virtuemart_medias WHERE file_url ='". $ficheros[$i] ."'";
+			$consulta = $BDVirtuemart->query($Sql);
+			if ($consulta->num_rows != 1){
+				// Quiere decir que es 0 o mas uno y si es mas uno se repiten registros para la misma foto...
+				$ficheroError[$e]['ruta']=$ficheros[$i];
+				$ficheroError[$e]['registros']=$consulta->num_rows;
+				$e++;
+			}
+			$i++;
+		}
+		return $ficheroError; 
+	
 	}
 	
 	function ObtenerProductos($BDVirtuemart,$prefijoTabla) {

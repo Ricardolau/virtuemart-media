@@ -8,14 +8,11 @@
 <html>
 <head>
 <?php
+	
 	include './../../head.php';
 	include './../../modulos/mod_conexion/conexionBaseDatos.php';
-// Ahora comprobamos hay parametros en la url
-if (isset($_GET['directorio'])) {
-	$directorioActual = $_GET['directorio'];
-} else {
-	$directorioActual = 'raiz';
-}?>
+	// Ahora comprobamos hay parametros en la url
+	?>
 </head>
 <body>
 	<?php 
@@ -25,14 +22,23 @@ if (isset($_GET['directorio'])) {
     <script src="<?php echo $HostNombre; ?>/modulos/mod_revisar_img_products/funciones.js"></script>
 <?php
 	// Inicializamos variable de inicio y entorno:
+	// 		$Nom_Dir_Actual : Es nombre del directorio actual.
+	//		$Dir_Actual: Ruta del directorio actual DESDE la instalacion de joomla... NO ES UNA RUTA COMPLETA. $DirImageProdVirtue más directorio Actual si lo hay.
+	// 		$rutas : Ruta completa
+	// 		$error : la utilizamos para saber si hubo un error antes de cargar la pagina.
+	//
 	$error ='';
-	$ruta = $RutaServidor.$DirImageProdVirtue;
-	
+	$Dir_Actual = $DirImageProdVirtue; // Ya que puede cambiar segun carpeta que estemos.
+	$ruta = $RutaServidor.$DirInstVirtuemart.$Dir_Actual;
 	$ficheros = array ();
+
 	//Si estamos en un sub-directorio entonce $DirImageProdVirtue cambia....
-	if ($directorioActual != 'raiz'){
-		$DirImageProdVirtue = $DirImageProdVirtue.$directorioActual.'/';
-		$ruta = $ruta.$directorioActual.'/';
+	if (isset($_GET['directorio'])) {
+		$Nom_Dir_Actual = $_GET['directorio'];
+		$Dir_Actual .= $Nom_Dir_Actual.'/';
+		$ruta = $ruta.$Nom_Dir_Actual.'/';
+	} else {
+		$Nom_Dir_Actual = 'raiz';
 	}
 	// Obtenemos directorios
 	$directorios = ObtenerDirectorios($ruta);
@@ -51,15 +57,19 @@ if (isset($_GET['directorio'])) {
 	}	
 	
 	
-	//~ //Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
-	$files = filesProductos($RutaServidor,$DirImageProdVirtue); 
-	//~ // Obtenemos files y directorios 
+	//Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
+	$files = filesProductos($RutaServidor,$Dir_Actual,$DirInstVirtuemart); 
+	// Obtenemos files y directorios 
 	if (empty($files['error'])){
 		$ficheros['Total'] = count($files);
 	} else {
 		$error .= $files['error'];
 	}
 	
+	//Obtenemos la cantidad de ficheros que no se utilizan en virtuemart_media.
+	if ($ficheros['Total']){
+		$ficheros['ImgNoUtilizadas']= fileNoUtilizados ($BDVirtuemart,$prefijoTabla,$files,$Dir_Actual);
+	} 
 	
 	// Ahora comprobamos:
 	//		1.- Registros que hay en tabla Media
@@ -98,9 +108,9 @@ if (isset($_GET['directorio'])) {
 	<?php 
 	// Código para debug
 	//~ echo $DirImageProdVirtue;
-	//~ echo '<pre>';
-	//~ print_r($RutaServidor);
-	//~ echo '</pre>';
+	echo '<pre>';
+	print_r($ficheros['ImgNoUtilizadas']);
+	echo '</pre>';
 	//~ echo '<pre>';
 	//~ print_r($files );
 	//~ echo '</pre>';
@@ -129,12 +139,12 @@ if (isset($_GET['directorio'])) {
 			<div class="col-md-3">
 				<h4>Analisis de directorio:</h4>
 				<p>Saber cuantas y cuales son las carpetas existen en el directorio asigando para los productos</p>
-				<h5><strong>Directorio actual:<?php echo '/'.$directorioActual;?></strong></h5>
-				<?php if ($directorioActual != 'raiz') { ?>
+				<h5><strong>Directorio actual:<?php echo '/'.$Nom_Dir_Actual;?></strong></h5>
+				<?php if ($Nom_Dir_Actual != 'raiz') { ?>
 					<a href="./revisarImgProducts.php">
 				<?php } ?>
 				<span class="glyphicon glyphicon-home"></span>
-				<?php if ($directorioActual != 'raiz') { ?>
+				<?php if ($Nom_Dir_Actual != 'raiz') { ?>
 					</a> 
 				<?php } ?>
 				<div>
@@ -145,11 +155,11 @@ if (isset($_GET['directorio'])) {
 					// Mostramos las carpetas
 					foreach ($directorios as $directorio){
 						echo '-> '; // Separador...
-						if ($directorioActual != $directorio['Nombre']) { ?>
+						if ($Nom_Dir_Actual != $directorio['Nombre']) { ?>
 								<a href="?<?php echo'&directorio='.$directorio['Nombre']?>">
 						<?php }
 						echo $directorio['Nombre']; 
-						if ($directorioActual != $directorio['Nombre']) { ?>
+						if ($Nom_Dir_Actual != $directorio['Nombre']) { ?>
 								</a><br/>
 						<?php }
 					}
@@ -159,9 +169,9 @@ if (isset($_GET['directorio'])) {
 				<h4>Analisis de Ficheros:</h4>
 				<p>Analizamos los ficheros que dentro del directorio</p>
 				<ul style="padding-left:15px;"> 
-					<li> <strong>Total Ficheros:</strong> Cuantos ficheros existen en esta carpeta <strong><?php echo '/'.$directorioActual;?></strong></li>
+					<li> <strong>Total Ficheros:</strong> Cuantos ficheros existen en esta carpeta <strong><?php echo '/'.$Nom_Dir_Actual;?></strong></li>
 					<li> <strong>Ficheros No imagenes:</strong> Cuantos no son imagenes (jpg o png). </li>
-					<li> <strong>Ficheros No utiliza Media:</strong> Cuantos registros de virtuemart_media de tipo product no se utilizan.</li>
+					<li> <strong>Ficheros No utiliza Media:</strong> Cuantos no se utilizan en virtuemart_media como tipo de product.</li>
 				</ul> 
 				<div class="floatL marginL20">
 					Total Ficheros 

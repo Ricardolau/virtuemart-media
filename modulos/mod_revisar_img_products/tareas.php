@@ -21,6 +21,17 @@ include_once ("./funciones.php");
 $pulsado = $_POST['pulsado'];
  
  switch ($pulsado) {
+	case 'ImagenesQueNoseUtilizan':
+		// Obtenemos los files, en vez mandarlos por Ajax.
+		$Dir_Actual = $DirImageProdVirtue;
+		if ($_POST['Nom_Dir_actual'] <>''){
+			$Dir_Actual = $DirImageProdVirtue.$_POST['Nom_Dir_actual'].'/';
+		}
+		$files = filesProductos($RutaServidor,$Dir_Actual,$DirInstVirtuemart);
+		$ficherosNoUtilizado = fileNoUtilizados ($BDVirtuemart,$prefijoTabla,$files,$Dir_Actual)
+		header("Content-Type: application/json;charset=utf-8");
+		echo json_encode($ficherosNoUtilizado);
+		break;
 	case 'comprobarEstado':
 		$nombrefichero = $_POST['ficheros'];
 		$checkID = $_POST['checkID'];
