@@ -2,8 +2,9 @@ function procesosPendientes() {
 	// Aquí lo que hacemos es ejecutar los procesos que tardan
 		textoMostrar = "Iniciamos ciclos que tardan.";
 		$("#proceso").html(textoMostrar);
-		// Iniciamos ciclo;
+		// Iniciamos contador;
 		contador = setInterval(ponSegundero, 1000); 
+		
 		return;
 	}
 
@@ -49,11 +50,7 @@ function controlCiclo(){
 	} else {
 		// Empezamos el primer proceso.
 		ProcesoActual = arrayProcesos[0];
-
-		}
-	
-	
-	
+	}
 	console.log(segundero);
 	// Si el segundero esta al maximos permitido (10) o Nindice es menor 0 , quiere decir que termino
 	if (segundero > 10  || Nindice< 0) {
@@ -68,7 +65,9 @@ function controlCiclo(){
 function ponSegundero(){
 	segundero= segundero +1;
 	$("#proceso").html('Iniciamos '+ProcesoActual+' tiempo '+segundero +' s');
+	// Iniciamos ciclo procesos
 	controlCiclo();
+	return;
 	
 }
 

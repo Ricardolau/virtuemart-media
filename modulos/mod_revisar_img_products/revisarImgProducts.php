@@ -47,15 +47,18 @@ if (isset($_GET['directorio'])) {
 	if (isset($TodosProductos['ErrorConsulta'])){
 		// Ahora comprobamos si hubo un error en la consulta,
 		$error = '<p>Error de conexion con la base de datos o no hay articulos pasados</p>';
-		$error .= '<p>'.$TodosProductos['ErrorConsulta'].'</p>';
+		$error .= '<p>'.$TodosProductos['ErrorConsulta'].'</p><br/>';
 	}	
 	
-	//~ //Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
-	//~ $DirectoriosFiles = filesProductos($RutaServidor,$DirImageProdVirtue); 
-	//~ // Obtenemos files y directorios 
-	//~ $files = $DirectoriosFiles['fichero'];
-	//~ // $directorios = $DirectoriosFiles['directorio'];
 	
+	//~ //Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
+	$files = filesProductos($RutaServidor,$DirImageProdVirtue); 
+	//~ // Obtenemos files y directorios 
+	if (empty($files['error'])){
+		$ficheros['Total'] = count($files);
+	} else {
+		$error .= $files['error'];
+	}
 	
 	
 	// Ahora comprobamos:
@@ -94,12 +97,12 @@ if (isset($_GET['directorio'])) {
 
 	<?php 
 	// Código para debug
-	//~ echo $directorioActual;
+	//~ echo $DirImageProdVirtue;
 	//~ echo '<pre>';
-	//~ print_r($directorios);
+	//~ print_r($RutaServidor);
 	//~ echo '</pre>';
 	//~ echo '<pre>';
-	//~ print_r($_GET);
+	//~ print_r($files );
 	//~ echo '</pre>';
 	
 	?>
@@ -162,7 +165,7 @@ if (isset($_GET['directorio'])) {
 				</ul> 
 				<div class="floatL marginL20">
 					Total Ficheros 
-					<span class="label label-default"><?php echo $Media['NumeroFiles'];?></span>
+					<span class="label label-default"><?php echo $ficheros['Total'];?></span>
 				</div>
 				
 				<div class="floatL marginL20">
@@ -182,7 +185,7 @@ if (isset($_GET['directorio'])) {
 			</div>
 			<div class="col-md-3">
 				<h4>Analisis de Productos:</h4>
-				<ul>
+				<ul style="padding-left:15px;">
 					<li> <strong>Productos Total:</strong>Cantidad de Productos que hay.</li>
 					<li> <strong>Productos sin imagen:</strong>Que productos no tiene imagen asignada.</li>
 					<li> <strong>Productos Imagen Mal:</strong>Cuantos productos tiene una imagen MAL asignada o no existe.</li>
@@ -206,7 +209,7 @@ if (isset($_GET['directorio'])) {
 			<div class="col-md-3">
 				<h4>Analisis de Medios:</h4>
 				<p>Llamamos Medios, a la tabla que utiliza virtuemart para "Gestion de Medios"</p>
-				<ul>
+				<ul style="padding-left:15px;">
 					<li> <strong>Registros en Media:</strong> Cuantos registros hay en virtuemart_media (solo tipo producto).</li>
 					<li> <strong>Url de Media mal:</strong> Comprobamos cuantas urls de media no son correctas.</li>
 				</ul>

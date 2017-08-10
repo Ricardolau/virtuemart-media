@@ -6,12 +6,11 @@
 	 * */
 
 	function ObtenerDirectorios($ruta) {
-		// Instruccion a utilizar find .ruta -mindepth 1 -maxdepth 1 -type d
+		// Obtenemos directorios que hay dentro de ruta, menos los resized..
 		$Nletras = strlen($ruta);
 		$LeerDir = array();
 		$instruccion = "find ".$ruta." -mindepth 1 -maxdepth 1 -type d";
 		exec($instruccion,$out,$e);
-
 		$d= 0;
 		foreach ($out as $rutaDirectorio){
 			// Extraemos nombre directorio.
@@ -27,36 +26,31 @@
 	
 	function filesProductos($RutaServidor,$DirImageProdVirtue)
 	{	
-		$LeerDir = array();
+		// Obtener las rutas de los ficheros.
+		$LeerFiles = array();
 		$ruta = $RutaServidor.$DirImageProdVirtue;
-		$filesDir = scandir($ruta);
-		$d= 0;
+		if (is_dir($ruta) === false){
+			$LeerFiles['error'] = ' Ruta mal, '.$ruta;
+			return $LeerFiles;
+		}
+		$files = scandir($ruta);
 		$f= 0;
-		foreach ($filesDir as $fileDir){
+		foreach ($files as $file){
 			// Filtramos los . y .. que nos coje tb
-			if ($fileDir != '.' and $fileDir != '..'){
-				if (is_dir($ruta.$fileDir)){
-					if ( $fileDir != 'resized'){
-						$LeerDir['directorio'][$d]['Nombre'] = $fileDir;
-						//~ $LeerDir['directorio'][$d]['Ruta'] = $ruta.$fileDir;
-
-						$d++;
-					}
-				} else  {
-					$LeerDir['fichero'][$f]['Nombre'] = $fileDir;
-					$f++;
-				}
+			if (is_dir($ruta.$file)===false){
+				$LeerFiles[$f]['fichero'] = $file;
+				$f++;
 			}
 		}
 		
 		//~ $files = array_filter(glob($RutaServidor.$DirImageProdVirtue."*"), 'is_file');
-		return $LeerDir ;
+		return $LeerFiles ;
 	}
 	
 	function ObtenerProductos($BDVirtuemart,$prefijoTabla) {
 		// Obtenemos:
 		// 	1.- ID de producto
-		//	2.- Referencia Proveedor del Producto ( Multipiezas se utiliza ) 
+		//	2.- Campo 'product_gtin' que es la Referencia Proveedor del Producto ( Multipiezas se utiliza ) 
 		//  3.- ID Multimedia ( Si hay pone 0)
 		// Teniendo en cuenta que repite ID producto si hay varias imagenes en virtuemar_product_media
 		$Productos = array();
