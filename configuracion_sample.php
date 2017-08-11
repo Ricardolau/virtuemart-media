@@ -12,5 +12,5 @@ $prefijoTabla ="xxxx"; // Prefijo tabla joomla
 $ImgAltoCfg = 401; // Alto máximo recorte
 $ImgAnchoCfg = 401; // Ancho máximo recorte.
 $DirInstVirtuemart = "/instalacionLocal"; //Donde esta instalado web.
-$DirImageProdVirtue = $DirInstVirtuemart."/images/stories/virtuemart/product/";//Donde estan las imagenes de virtuemart productos.
+$DirImageProdVirtue = "/images/stories/virtuemart/product/";//Donde estan las imagenes de virtuemart productos.
 ?>
