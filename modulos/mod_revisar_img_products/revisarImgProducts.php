@@ -126,10 +126,10 @@
 		<div class="col-md-8">
 			<h3>Objetivo:</h3>
 			<p>El objetivo es analizar las imagenes que utilizan los productos de virtuemart, tanto los registros en la tablas como los directorios donde se guardan los ficheros.</p>
-			<p>La tabla donde se guardan las rutas es //prefijo//_virtuemart_medias.</p>
-			<p>La tabla donde se guarda que imagenes utiliza un producto, es //prefijo_virtuemart_product_medias</p>
+			<a href ="" data-toggle="modal" data-target="#miModal">Más info</a>
 			
-			
+			<!-- Caramamos pantallas modal , que muestrar al hacer ponerse encima -->
+			<?php include './paginaModal.php'; ?>
 		</div>
 		<div class="col-md-4">
 			<h3>Barra de proceso</h3>
@@ -183,13 +183,20 @@
 				
 				<div class="floatL marginL20">
 					<?php if (count($ficheros['NoImagenes'])>0){
-					$advertencia= 'warning';
+						$advertencia= 'warning';
+						echo '<a href="./vistaFic_NoValidos.php?directorio='.$Nom_Dir_Actual.'">';
 					} else {
 					$advertencia= 'default';
 					}
 					?>
 					Ficheros NO imagenes 
+					
 					<span class="label label-<?php echo $advertencia; ?>"><?php echo count($ficheros['NoImagenes']);?></span>
+					<?php if (count($ficheros['NoImagenes'])>0)
+					{
+						echo '</a>';
+					}
+					?>
 				</div>
 				<div class="floatL marginL20" id="IDImgNoUtiliza">
 					Ficheros No Media 
