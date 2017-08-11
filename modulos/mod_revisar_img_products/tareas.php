@@ -1,16 +1,12 @@
 <?php
 /* Fichero de tareas a realizar.
- * 
+ * se utiliza para ejecutar funciones desde cliente ( AJAX)
  * 
  * Con el switch al final y variable $pulsado
  
- * 		$pulsado = 'comprobarProductos						-> Ejectua MsqlCsv($lineaA, $lineaF,$nombrecsv);
  * 
  *  */
-/* ===============  REALIZAMOS CONEXIONES  ===============*/
-// creo que esta recogida de datos debe estar antes swich y solo pulsado.
-// la tabla solo en la opción que la necesite.
-
+// Cargamos configuracion.
 include_once ("./../../configuracion.php");
 // Crealizamos conexion a la BD Datos
 include_once ("./../mod_conexion/conexionBaseDatos.php");
@@ -33,6 +29,7 @@ $pulsado = $_POST['pulsado'];
 		echo json_encode($ficherosNoUtilizado);
 		break;
 	case 'comprobarEstado':
+		// Se utiliza en vistaMediaProductos.php
 		$nombrefichero = $_POST['ficheros'];
 		$checkID = $_POST['checkID'];
         $ComprobarEstado = comprobarEstado($nombrefichero,$HostNombre,$DirImageProdVirtue,$checkID);
@@ -40,23 +37,23 @@ $pulsado = $_POST['pulsado'];
 		echo json_encode($ComprobarEstado);
         break;
 	
-	case 'comprobarProductos':
-        $TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
-        $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
-        header("Content-Type: application/json;charset=utf-8");
-		$algo='Devuelvo algo';
-		echo json_encode($productos);
-        break;
-	
-	case 'ProductosImagen':
-        // Tanto podemos recibir uno mas productos, en un array
-        $TodosProductos = $_POST['ArrayEnviado'];
-
-        $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
-        header("Content-Type: application/json;charset=utf-8");
-		$algo='Devuelvo algo';
-		echo json_encode($productos);
-        break;
+	//~ case 'comprobarProductos':
+        //~ $TodosProductos = ObtenerProductos($BDVirtuemart,$prefijoTabla);
+        //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
+        //~ header("Content-Type: application/json;charset=utf-8");
+		//~ $algo='Devuelvo algo';
+		//~ echo json_encode($productos);
+        //~ break;
+	//~ 
+	//~ case 'ProductosImagen':
+        //~ // Tanto podemos recibir uno mas productos, en un array
+        //~ $TodosProductos = $_POST['ArrayEnviado'];
+//~ 
+        //~ $productos = ProductosImagenMal($TodosProductos,$BDVirtuemart,$prefijoTabla,$DirInstVirtuemart,$RutaServidor );
+        //~ header("Content-Type: application/json;charset=utf-8");
+		//~ $algo='Devuelvo algo';
+		//~ echo json_encode($productos);
+        //~ break;
 }
  
 /* ===============  CERRAMOS CONEXIONES  ===============*/

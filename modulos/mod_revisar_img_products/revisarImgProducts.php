@@ -23,7 +23,7 @@
 <?php
 	// Inicializamos variable de inicio y entorno:
 	// 		$Nom_Dir_Actual : Es nombre del directorio actual.
-	//		$Dir_Actual: Ruta del directorio actual DESDE la instalacion de joomla... NO ES UNA RUTA COMPLETA. $DirImageProdVirtue más directorio Actual si lo hay.
+	//		$Dir_Actual: Ruta del directorio actual DESDE la instalacion de joomla... NO ES UNA RUTA COMPLETA. 
 	// 		$rutas : Ruta completa
 	// 		$error : la utilizamos para saber si hubo un error antes de cargar la pagina.
 	//
@@ -60,6 +60,7 @@
 	//Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
 	$files = filesProductos($RutaServidor,$Dir_Actual,$DirInstVirtuemart); 
 	// Obtenemos files y directorios 
+	
 	if (empty($files['error'])){
 		$ficheros['Total'] = count($files);
 	} else {
@@ -108,6 +109,8 @@
 	<?php 
 	// Código para debug
 	//~ echo $DirImageProdVirtue;
+	//~ $fi1 = array_column($ficheros['ImgNoUtilizadas'], '0);
+
 	//~ echo '<pre>';
 	//~ print_r($ficheros['ImgNoUtilizadas']);
 	//~ echo '</pre>';
@@ -188,9 +191,9 @@
 					Ficheros NO imagenes 
 					<span class="label label-<?php echo $advertencia; ?>"><?php echo count($ficheros['NoImagenes']);?></span>
 				</div>
-				<div class="floatL marginL20">
+				<div class="floatL marginL20" id="IDImgNoUtiliza">
 					Ficheros No Media 
-					<span class="label label-default">?</span>
+					<span  class="label label-default">?</span>
 				</div>
 			</div>
 			<div class="col-md-3">

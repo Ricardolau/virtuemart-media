@@ -9,7 +9,7 @@ function procesosPendientes() {
 	}
 
 function comprobarProductos() {
-	// Script que utilizamos para ejecutar funcion de php.
+	// Script que utilizamos para ejecutar en vistaMediaProductos.
 	var parametros = {
 	 "pulsado" 	: 'comprobarProductos'
 			};
@@ -25,13 +25,13 @@ function comprobarProductos() {
 		},
 		success:  function (response) {
 				// Cuando se recibe un array con JSON tenemos que parseJSON
-				//~ var resultado =  $.parseJSON(response)
+				// var resultado =  $.parseJSON(response)
 				$("#proceso").html('Terminado la comprobacion de productos y obtener ID de media');
 				arrayConsulta = response;
-				//~ if (arrayConsulta['TotalProductos'] > 0 ){
-					//~ NEnviado = 0
-					//~ ciclo();
-				//~ }
+				// if (arrayConsulta['TotalProductos'] > 0 ){
+					// NEnviado = 0
+					// ciclo();
+				// }
 		}
 	});
 	return;
@@ -64,8 +64,6 @@ function controlCiclo(){
 		case 'ImagenesQueNoseUtilizan':
 			ImagenesQueNoseUtilizan();
 			break;
-		
-		
 	} 
 	
 }
@@ -96,12 +94,14 @@ function ImagenesQueNoseUtilizan(){
 		success:  function (response) {
 				// Cuando se recibe un array con JSON tenemos que parseJSON
 				//~ var resultado =  $.parseJSON(response)
-				$("#proceso").html('Terminado la comprobacion si las imagenes del directorio '+NomDirActual+' se utilizan');
-				//arrayConsulta = response;
-				//~ if (arrayConsulta['TotalProductos'] > 0 ){
-					//~ NEnviado = 0
-					//~ ciclo();
-				//~ }
+				console.log(response.length);
+				$("#proceso").html('Terminado la comprobacion que imagenes del directorio '+NomDirActual+' se utilizan o No.');
+				if (response.length>0){
+					$('#IDImgNoUtiliza').html('<a href="./vistaFic_NoMedia.php?directorio='+NomDirActual+'">Ficheros No Media <span class="label label-warning">'+response.length+'</span></a>');
+				} else {
+					$('#IDImgNoUtiliza').html('Ficheros No Media <span class="label label-default">0</span>');
+				}
+				
 		}
 	});
 	return;
