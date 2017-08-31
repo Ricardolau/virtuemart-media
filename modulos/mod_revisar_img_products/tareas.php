@@ -21,7 +21,12 @@ $pulsado = $_POST['pulsado'];
 		// Obtenemos los files, en vez mandarlos por Ajax.
 		$Dir_Actual = $DirImageProdVirtue;
 		if ($_POST['Nom_Dir_actual'] <>''){
-			$Dir_Actual = $DirImageProdVirtue.$_POST['Nom_Dir_actual'].'/';
+			if ($_POST['Nom_Dir_actual'] != 'raiz'){
+				$Dir_Actual = $DirImageProdVirtue.$_POST['Nom_Dir_actual'].'/';
+			} else {
+				$Dir_Actual = $DirImageProdVirtue;
+
+			}
 		}
 		$files = filesProductos($RutaServidor,$Dir_Actual,$DirInstVirtuemart);
 		$ficherosNoUtilizado = fileNoUtilizados ($BDVirtuemart,$prefijoTabla,$files,$Dir_Actual);

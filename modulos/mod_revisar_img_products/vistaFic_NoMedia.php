@@ -18,10 +18,10 @@
 	//Si estamos en un sub-directorio entonce $DirImageProdVirtue cambia....
 	if (isset($_GET['directorio'])) {
 		$Nom_Dir_Actual = $_GET['directorio'];
-		$Dir_Actual .= $Nom_Dir_Actual.'/';
-		$ruta = $ruta.$Nom_Dir_Actual.'/';
-	} else {
-		$Nom_Dir_Actual = 'raiz';
+		if ($Nom_Dir_Actual != 'raiz'){
+			$Dir_Actual .= $Nom_Dir_Actual.'/';
+			$ruta = $ruta.$Nom_Dir_Actual.'/';
+		}
 	}
 	//Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
 	$files = filesProductos($RutaServidor,$Dir_Actual,$DirInstVirtuemart); 
@@ -42,7 +42,6 @@
 	<p>Se han encontrado <?php echo count($ficheros['ImgNoUtilizadas']);?> ficheros (jpg y png) de <strong>directorio <?php echo $Nom_Dir_Actual;?></strong> que no está añadidos a tabla de media</p>
 	
 	<!-- Mostramos barra y proceso que realizamos -->
-	</div>
 	<table class="table table-striped">
     <thead>
       <tr>

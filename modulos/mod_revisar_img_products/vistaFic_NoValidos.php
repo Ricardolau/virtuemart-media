@@ -18,32 +18,31 @@
 	//Si estamos en un sub-directorio entonce $DirImageProdVirtue cambia....
 	if (isset($_GET['directorio'])) {
 		$Nom_Dir_Actual = $_GET['directorio'];
-		$Dir_Actual .= $Nom_Dir_Actual.'/';
-		$ruta = $ruta.$Nom_Dir_Actual.'/';
-	} else {
-		$Nom_Dir_Actual = 'raiz';
+		if ($Nom_Dir_Actual != 'raiz'){
+			$Dir_Actual .= $Nom_Dir_Actual.'/';
+			$ruta = $ruta.$Nom_Dir_Actual.'/';
+		}
 	}
-	//Obtenemos array de ficheros y directorios que existen en directorio asignado para productos.
-	$files = filesProductos($RutaServidor,$Dir_Actual,$DirInstVirtuemart); 
-	if (empty($files['error'])){
-		$ficheros['Total'] = count($files);
-	} else {
-		$error .= $files['error'];
-	}
-	//Obtenemos la cantidad de ficheros que no se utilizan en virtuemart_media.
-	if ($ficheros['Total']){
-		$ficheros['ImgNoUtilizadas']= fileNoUtilizados ($BDVirtuemart,$prefijoTabla,$files,$Dir_Actual);
-	} 
-
+	// Obtenemos los ficheros que no son imagenes(jpg o png)
+	$instruccion = "find ".$ruta." -mindepth 1 -maxdepth 1 -type f \! \( -iname '*jpg' -or -iname '*png' \)";
+	exec($instruccion,$out,$e);
+	$ficheros['NoImagenes']= $out;
+	
+	
+	
 ?>
 
 <div class="container">
 	<h1>Mostramos los fichero no validos</h1>
 	<p>Consideramos ficheros no validos, todos aquellos que no son jpg y png</p>	
 	<p>Se han encontrado <?php echo count($ficheros['ImgNoUtilizadas']);?> ficheros (jpg y png) de <strong>directorio <?php echo $Nom_Dir_Actual;?></strong> que no está añadidos a tabla de media</p>
-	
+	<?php 
+	//~ echo '<pre>';
+	//~ print_r($ficheros['NoImagenes']);
+	//~ echo '</pre>';
+	?>
 	<!-- Mostramos barra y proceso que realizamos -->
-	</div>
+	
 	<table class="table table-striped">
     <thead>
       <tr>
@@ -56,7 +55,7 @@
     <tbody>
     <?php
 		$i= 0;
-		foreach ($ficheros['ImgNoUtilizadas'] as $fichero){
+		foreach ($ficheros['NoImagenes'] as $fichero){
 			$i++;
 			?>
 			<tr>
