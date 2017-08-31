@@ -26,7 +26,7 @@
 		
 		
 		</div>
-		<?php // Primera pregunta, lo hace con date aria-expanded ="false" o "true"	?>
+		<?php // Tercera, lo hace con date aria-expanded ="false" o "true"	?>
 		<h5>
 			<a data-toggle="collapse" data-parent="#accordion" href="#collapse3" aria-expanded="false">¿Que hace realmente el gestor multimedia de virtuemart?
 			<span style="float:right;" class="icono-collapse">+</span>
@@ -45,10 +45,7 @@
 			<p>Aquí puedes ver <a href="http://ayuda.svigo.es/index.php/programacion-2/cms/joomla/componentes/virtuemart/144-archivo-de-medios-de-virtuemart">mas info</a></p>
 				
 		</div>
-
-</div>
-<div>
-<h4>Virtuemart: Gestion de Medios</h4>
+		<?php // Cuarta pregunta, lo hace con date aria-expanded ="false" o "true"	?>
 		<h5>
 			<?php 
 			/* Para que este expandido, lo hace con date aria-expanded ="false" o "true"
@@ -59,6 +56,7 @@
 			</a>
 			
 		</h5>
+		<?php // Quinta pregunta, lo hace con date aria-expanded ="false" o "true"	?>
 		<div id="collapse4" class="collapse pepe">
 			<p>Lo que sucede es que en la tabla del producto seguira apuntando a esa imagen y mostrara el error imagen no encontrada.</p>
 			<p>El gestor multimedia de virtuemart (Archivos de medios) tambien aparecerá y seguira mostrando en el listado pero indicando icono de peligro, tipo no correcto.</p>
@@ -80,6 +78,27 @@
 			<p>El gestor multimedia de virtuemart (Archivos de medios) es controlado por la tabla virtuemart_media, por lo que seguirá existiendo en el servidor es imagen y su miniatura en el directorio asignado para productos.</p>
 			<p>El gestor multimedia tiene un filtro por tipo, podemos seleccionar "productos" y podemos comprobar que la imagen que quitamos del producto , sigue apareciendo , incluso con el tipo producto.</p>
 			
+		</div>
+		<?php // Quinta pregunta, lo hace con date aria-expanded ="false" o "true"	?>
+		<div id="collapse4" class="collapse pepe">
+			<p>Lo que sucede es que en la tabla del producto seguira apuntando a esa imagen y mostrara el error imagen no encontrada.</p>
+			<p>El gestor multimedia de virtuemart (Archivos de medios) tambien aparecerá y seguira mostrando en el listado pero indicando icono de peligro, tipo no correcto.</p>
+			
+			
+		</div>
+		<h5>
+			<?php 
+			/* Para que este expandido, lo hace con date aria-expanded ="false" o "true"
+			 * */
+			?>
+			<a data-toggle="collapse" data-parent="#accordion" href="#collapse6" aria-expanded="false">¿ Que sucede si tenemos organizadas las fotos dentro productos en carpetas?
+			<span style="float:right;" class="icono-collapse">+</span>
+			</a>
+			
+		</h5>
+		<div id="collapse6" class="collapse pepe">
+			<p>Realmente para mi es lo recomendable para web con muchas imagenes.</p>
+			<p>Lo unico que debes tener en cuenta es que las miniaturas tambien las guarda en carpetas dentro de <strong>resized</strong>,en el directorio raiz de productos, algo que me parece correcto.</p>
 		</div>
 		
 </div>
